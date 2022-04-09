@@ -70,6 +70,7 @@ export const asyncRouterMap = [
           }
         ]
       },
+
       // list
       {
         path: '/list',
@@ -173,6 +174,86 @@ export const asyncRouterMap = [
         ]
       },
 
+      {
+        path: '/user',
+        name: 'user',
+        component: RouteView,
+        redirect: '/user/list',
+        meta: { title: '用户管理', icon: 'warning', permission: ['order'] },
+        children: [
+          {
+            path: '/user/blogger',
+            name: 'BloggerList',
+            component: () => import(/* webpackChunkName: "fail" */ '@/views/user/BloggerList'),
+            meta: { title: '博主管理', permission: ['order'] },
+          },
+          {
+            path: '/user/blogger/detail',
+            name: 'BloggerListDetail',
+            component: () => import(/* webpackChunkName: "fail" */ '@/views/user/BloggerDetail'),
+            meta: { title: '查看详情', permission: ['order'] }
+          },
+          {
+            path: '/user/member',
+            name: 'MemberList',
+            component: () => import(/* webpackChunkName: "fail" */ '@/views/user/MemberList'),
+            meta: { title: '会员管理', permission: ['order'] }
+          }
+        ]
+      },
+
+
+      // order
+      {
+        path: '/order',
+        name: 'order',
+        component: RouteView,
+        redirect: '/order/list',
+        meta: { title: '订单管理', icon: 'warning', permission: ['order'] },
+        children: [
+          {
+            path: '/order/list',
+            name: 'OrderList',
+            component: () => import(/* webpackChunkName: "fail" */ '@/views/order/OrderList'),
+            meta: { title: '订单管理', permission: ['order'] }
+          }
+        ]
+      },
+
+      // content
+      {
+        path: '/content',
+        name: 'content',
+        component: RouteView,
+        redirect: '/content/list',
+        meta: { title: '运营管理', icon: 'warning', permission: ['order'] },
+        children: [
+          {
+            path: '/content/list',
+            name: 'ContentList',
+            component: () => import(/* webpackChunkName: "fail" */ '@/views/content/ContentList'),
+            meta: { title: '内容管理', permission: ['order'] }
+          }
+        ]
+      },
+
+      // content
+      {
+        path: '/sys',
+        name: 'sys',
+        component: RouteView,
+        redirect: '/sys/log',
+        meta: { title: '操作日志', icon: 'warning', permission: ['order'] },
+        children: [
+          {
+            path: '/syslog/list',
+            name: 'SyslogList',
+            component: () => import(/* webpackChunkName: "fail" */ '@/views/sys/LogList'),
+            meta: { title: '操作日志', permission: ['order'] }
+          }
+        ]
+      },
+
       // Exception
       {
         path: '/exception',
@@ -267,14 +348,13 @@ export const asyncRouterMap = [
             ]
           }
         ]
-      }
+      },
 
       // other
-      /*
       {
         path: '/other',
         name: 'otherPage',
-        component: PageView,
+        component: () => import('@/layouts/PageView'),
         meta: { title: '其他组件', icon: 'slack', permission: [ 'dashboard' ] },
         redirect: '/other/icon-selector',
         children: [
@@ -317,7 +397,7 @@ export const asyncRouterMap = [
               {
                 path: '/other/list/system-role',
                 name: 'SystemRole',
-                component: () => import('@/views/role/RoleList'),
+                component: () => import('@/views/other/RoleList'),
                 meta: { title: '角色列表2', keepAlive: true }
               },
               {
@@ -330,7 +410,6 @@ export const asyncRouterMap = [
           }
         ]
       }
-      */
     ]
   },
   {
