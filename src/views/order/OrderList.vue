@@ -59,6 +59,8 @@
             <a-col :md="!advanced && 8 || 24" :sm="24">
               <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
                 <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
+                <a-button style="margin-left: 8px" type="primary" @click="$refs.table.refresh(true)">导出</a-button>
+                <a-button style="margin-left: 8px" type="primary" @click="$refs.table.refresh(true)">全部导出</a-button>
                 <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
                 <a @click="toggleAdvanced" style="margin-left: 8px">
                   {{ advanced ? '收起' : '展开' }}
@@ -70,24 +72,11 @@
         </a-form>
       </div>
 
-      <div class="table-operator">
-        <a-button type="primary" icon="plus" @click="handleAdd">新建</a-button>
-        <a-dropdown v-action:edit v-if="selectedRowKeys.length > 0">
-          <a-menu slot="overlay">
-            <a-menu-item key="1"><a-icon type="delete" />删除</a-menu-item>
-            <!-- lock | unlock -->
-            <a-menu-item key="2"><a-icon type="lock" />锁定</a-menu-item>
-          </a-menu>
-          <a-button style="margin-left: 8px">
-            批量操作 <a-icon type="down" />
-          </a-button>
-        </a-dropdown>
-      </div>
-
       <s-table
         ref="table"
         size="default"
         rowKey="key"
+        :scroll="{x: 2500}"
         :columns="columns"
         :data="loadData"
         :rowSelection="rowSelection"
@@ -103,16 +92,28 @@
           <ellipsis :length="4" tooltip>{{ text }}</ellipsis>
         </span>
 
+        <div slot="payStatus" slot-scope="text, record" style="text-align: left">
+            <span v-if="text == 1">{{text | useDictPAY_STATUS}}</span>
+            <a-popover class="fail-reason" v-else title="订单失败原因" trigger="click" style="color: red;text-decoration: underline">
+                <template #content>
+                  <p>{{record.failInfo}}</p>
+                </template>
+                <a-button>{{text | useDictPAY_STATUS}}</a-button>
+            </a-popover>
+        </div>
+
+        <span slot="payType" slot-scope="text">
+            {{text | useDictPAY_TYPE}}
+        </span>
+
         <span slot="action" slot-scope="text, record">
           <template>
-            <a @click="handleEdit(record)">配置</a>
-            <a-divider type="vertical" />
-            <a @click="handleSub(record)">订阅报警</a>
+            <a @click="handleDetail(record)">查看详情</a>
           </template>
         </span>
       </s-table>
 
-      <create-form
+      <order-detail
         ref="createModal"
         :visible="visible"
         :loading="confirmLoading"
@@ -120,7 +121,6 @@
         @cancel="handleCancel"
         @ok="handleOk"
       />
-      <step-by-step-modal ref="modal" @ok="handleOk"/>
     </a-card>
   </page-header-wrapper>
 </template>
@@ -130,37 +130,42 @@
   import { STable, Ellipsis } from '@/components'
   import { getRoleList } from '@/api/manage'
 
-  import StepByStepModal from './modules/StepByStepModal'
-  import CreateForm from './modules/CreateForm'
+  import OrderDetail from './modules/OrderDetail'
   import { getOrderList } from '@/api/orderService'
   import { BUSINESS_TYPE, PAY_STATUS, PAY_TYPE } from '@/utils/dict'
 
   const columns = [
     {
       title: '序号',
-      scopedSlots: { customRender: 'serial' }
+      scopedSlots: { customRender: 'serial' },
+      width: 100
     },
     {
       title: '订单号',
-      dataIndex: 'orderNo'
+      dataIndex: 'orderNo',
+      width: 200,
+      align: 'center'
     },
     {
       title: '用户ID',
       dataIndex: 'userId',
+      align: 'center'
     },
     {
       title: '手机号',
       dataIndex: 'userPhone',
-      customRender: (text) => text && (text.substr(0,3)+'****'+text.substr(7))
+      customRender: (text) => text && (text.substr(0,3)+'****'+text.substr(7)),
+      align: 'center'
     },
     {
       title: '昵称',
-      dataIndex: 'tzNickname',
+      dataIndex: 'nickname',
+      align: 'center'
     },
     {
       title: '订单创建时间',
       dataIndex: 'ctime',
-      // sorter: true
+      align: 'center'
     },{
       title: '订单交易时间',
       dataIndex: 'payTime',
@@ -182,9 +187,12 @@
     },{
       title: '支付方式',
       dataIndex: 'payType',
+      scopedSlots: { customRender: 'payType' },
+      align: 'center'
     },{
       title: '支付状态',
       dataIndex: 'payStatus',
+      scopedSlots: { customRender: 'payStatus' },
     },{
       title: '交易金额（元）',
       dataIndex: 'payPrice',
@@ -193,6 +201,7 @@
       title: '操作',
       dataIndex: 'action',
       width: '150px',
+      fixed: 'right',
       scopedSlots: { customRender: 'action' }
     }
   ]
@@ -221,8 +230,7 @@
     components: {
       STable,
       Ellipsis,
-      CreateForm,
-      StepByStepModal
+      OrderDetail
     },
     data () {
       this.columns = columns
@@ -231,8 +239,9 @@
         PAY_TYPE: PAY_TYPE,
         BUSINESS_TYPE: BUSINESS_TYPE,
         visible: false,
+        detailModalShow: false,
         confirmLoading: false,
-        mdl: null,
+        mdl: {},
         // 高级搜索 展开/关闭
         advanced: false,
         // 查询参数
@@ -285,63 +294,15 @@
       }
     },
     methods: {
-      handleAdd () {
-        this.mdl = null
-        this.visible = true
-      },
-      handleEdit (record) {
-        this.visible = true
-        this.mdl = { ...record }
+      handleDetail(record){debugger
+        this.mdl = record;
+        this.visible = true;
       },
       handleOk () {
-        const form = this.$refs.createModal.form
-        this.confirmLoading = true
-        form.validateFields((errors, values) => {
-          if (!errors) {
-            console.log('values', values)
-            if (values.id > 0) {
-              // 修改 e.g.
-              new Promise((resolve, reject) => {
-                setTimeout(() => {
-                  resolve()
-                }, 1000)
-              }).then(res => {
-                this.visible = false
-                this.confirmLoading = false
-                // 重置表单数据
-                form.resetFields()
-                // 刷新表格
-                this.$refs.table.refresh()
-
-                this.$message.info('修改成功')
-              })
-            } else {
-              // 新增
-              new Promise((resolve, reject) => {
-                setTimeout(() => {
-                  resolve()
-                }, 1000)
-              }).then(res => {
-                this.visible = false
-                this.confirmLoading = false
-                // 重置表单数据
-                form.resetFields()
-                // 刷新表格
-                this.$refs.table.refresh()
-
-                this.$message.info('新增成功')
-              })
-            }
-          } else {
-            this.confirmLoading = false
-          }
-        })
+        this.visible = false
       },
       handleCancel () {
         this.visible = false
-
-        const form = this.$refs.createModal.form
-        form.resetFields() // 清理表单数据（可不做）
       },
       handleSub (record) {
         if (record.status !== 0) {
@@ -368,5 +329,18 @@
 <style lang="less" scoped>
   /deep/.ant-form-item-children{
     display: flex;
+  }
+  .fail-reason{
+    &.ant-btn{
+      color: red;
+      text-decoration: underline;
+      border: none;
+      padding: 0;
+      background: unset;
+      box-shadow: unset;
+      /deep/&>span{
+        text-decoration: underline !important;
+      }
+    }
   }
 </style>

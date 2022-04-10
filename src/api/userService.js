@@ -8,6 +8,20 @@ export function getBloggerList (parameter) {
   })
 }
 
+/**
+* @Description: 普通用户
+* @Param:
+* @return:
+* @Author: zzhihang@hotmail.com
+* @date: 2022/4/10 14:17
+*/
+export function getMemberList(parameter){
+  return request({
+    url: '/admin/user/pt',
+    method: 'post',
+    data: parameter
+  })
+}
 
 /**
 * @Description: 禁用 参数 id
@@ -74,5 +88,21 @@ export function userQuery (id) {
     url: '/admin/user/tz/info',
     method: 'post',
     data: {id}
+  })
+}
+
+/**
+* @Description: 会员信息查询
+* @Param:
+* @return:
+* @Author: zzhihang@hotmail.com
+* @date: 2022/4/10 14:44
+*/
+
+export function getMemberInfo (params) {
+  return request({
+    url: '/admin/user/pt/info',
+    method: 'post',
+    data: params
   })
 }

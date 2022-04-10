@@ -23,6 +23,9 @@
             </a-col>
             <a-col :md="24" :sm="24" style="text-align: right">
               <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
+              <a-button style="margin-left: 8px" type="primary" @click="exportSelect">导出</a-button>
+              <a-button style="margin-left: 8px" type="primary" @click="exportAll">全部导出</a-button>
+              <a-button style="margin-left: 8px" type="primary" @click="handleAdd">创建用户</a-button>
               <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
             </a-col>
           </a-row>
@@ -41,15 +44,13 @@
         <span slot="serial" slot-scope="text, record, index">
           {{ index + 1 }}
         </span>
-        <span slot="status" slot-scope="text">
-          <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
+        <span slot="disable" slot-scope="text, record, index">
+          <a-switch :checked="String(text) === '1'" checked-children="启用中" un-checked-children="禁用中" @change="onDisableChange(record)"/>
         </span>
 
         <span slot="action" slot-scope="text, record">
           <template>
-            <a @click="handleEdit(record)">配置</a>
-            <a-divider type="vertical" />
-            <a @click="handleSub(record)">订阅报警</a>
+            <a @click="handleDetail(record)">查看详情</a>
           </template>
         </span>
       </s-table>
@@ -58,6 +59,9 @@
         :visible="visible"
         :loading="confirmLoading"
         :model="mdl"
+        :create-user-id="createUserId"
+        :create-user-url="createUserUrl"
+        :rowSelection="rowSelection"
         @cancel="handleCancel"
         @ok="handleOk"
       />
@@ -66,12 +70,11 @@
 </template>
 
 <script>
-  import moment from 'moment'
   import { STable } from '@/components'
   import { getRoleList } from '@/api/manage'
-  import CreateForm from './modules/CreateForm'
   import { CONTENT_STATUS } from '@/utils/dict'
-  import { getContentList } from '@/api/contentService'
+  import { getMemberList, userDisable, userEnable, userSave } from '@/api/userService'
+  import CreateForm from './modules/CreateForm'
 
   const columns = [
     {
@@ -80,36 +83,51 @@
     },
     {
       title: '用户ID',
-      dataIndex: 'userId',
+      dataIndex: 'id',
+    },
+    {
+      title: '用户昵称',
+      dataIndex: 'nickname',
     },
     {
       title: '手机号',
-      dataIndex: 'userPhone',
+      dataIndex: 'phone',
       customRender: (text) => text && (text.substr(0,3)+'****'+text.substr(7))
+    },{
+      title: '微信号',
+      dataIndex: 'wxNumber',
     },
     {
-      title: '昵称',
-      dataIndex: 'tzNickname',
-    },
-    {
-      title: '发送时间',
+      title: '注册时间',
       dataIndex: 'ctime',
-      // sorter: true
     },{
-      title: '文本',
-      dataIndex: 'payTime',
+      title: '订阅记录',
+      children: [{
+        title: '订阅开始时间',
+        dataIndex: 'subscribeTime',
+      }, {
+        title: '订阅结束时间',
+        dataIndex: 'age',
+      }, {
+        title: '博主用户ID',
+        dataIndex: 'tzId',
+      }, {
+        title: '博主昵称',
+        dataIndex: 'tzNickname',
+      }, {
+        title: '专题名称',
+        dataIndex: 'age',
+      }, {
+        title: '订阅类型',
+        dataIndex: 'subscribeType',
+      }, {
+        title: '订阅状态',
+        dataIndex: 'subscribeStatus',
+      }],
     },{
-      title: '图片',
-      dataIndex: 'tzUserId',
-    },{
-      title: '文档',
-      dataIndex: 'tzNickname',
-    },{
-      title: '语音',
-      dataIndex: 'businessTitle',
-    },{
-      title: '审核状态',
-      dataIndex: 'orderType',
+      title: '禁用账户',
+      dataIndex: 'status',
+      scopedSlots: { customRender: 'disable' }
     },
     {
       title: '操作',
@@ -142,7 +160,7 @@
     name: 'TableList',
     components: {
       STable,
-      CreateForm
+      CreateForm,
     },
     data () {
       this.columns = columns
@@ -151,9 +169,8 @@
         visible: false,
         confirmLoading: false,
         mdl: null,
-        // 高级搜索 展开/关闭
-        advanced: false,
-        // 查询参数
+        createUserId: '',
+        createUserUrl: '',
         queryParam: {
           queryText: '',
           status: '',
@@ -161,10 +178,9 @@
           ctimeEnd: '',
           ctime: '',
         },
-        // 加载数据方法 必须为 Promise 对象
         loadData: parameter => {
           const requestParameters = Object.assign({}, parameter, this.queryParam)
-          return getContentList(requestParameters)
+          return getMemberList(requestParameters)
             .then(res => {
               return res.data
             })
@@ -202,74 +218,77 @@
         this.mdl = { ...record }
       },
       handleOk () {
-        const form = this.$refs.createModal.form
-        this.confirmLoading = true
-        form.validateFields((errors, values) => {
-          if (!errors) {
-            console.log('values', values)
-            if (values.id > 0) {
-              // 修改 e.g.
-              new Promise((resolve, reject) => {
-                setTimeout(() => {
-                  resolve()
-                }, 1000)
-              }).then(res => {
-                this.visible = false
-                this.confirmLoading = false
-                // 重置表单数据
-                form.resetFields()
-                // 刷新表格
-                this.$refs.table.refresh()
-
-                this.$message.info('修改成功')
-              })
+        if(this.createUserId){
+          this.visible = false;
+          this.createUserId = '';
+          this.createUserUrl = '';
+        }else{
+          const form = this.$refs.createModal.form
+          this.confirmLoading = true
+          form.validateFields(async (errors, values) => {
+            if (!errors) {
+              const {data} = await userSave(values);
+              this.createUserId = data.id;
+              this.createUserUrl = data.url
+              this.confirmLoading = false
+              // 重置表单数据
+              form.resetFields()
+              this.$refs.table.refresh()
+              this.$message.info('新增成功')
             } else {
-              // 新增
-              new Promise((resolve, reject) => {
-                setTimeout(() => {
-                  resolve()
-                }, 1000)
-              }).then(res => {
-                this.visible = false
-                this.confirmLoading = false
-                // 重置表单数据
-                form.resetFields()
-                // 刷新表格
-                this.$refs.table.refresh()
-
-                this.$message.info('新增成功')
-              })
+              this.confirmLoading = false
             }
-          } else {
-            this.confirmLoading = false
-          }
-        })
+          })
+        }
       },
       handleCancel () {
         this.visible = false
-
         const form = this.$refs.createModal.form
         form.resetFields() // 清理表单数据（可不做）
       },
-      handleSub (record) {
-        if (record.status !== 0) {
-          this.$message.info(`${record.no} 订阅成功`)
-        } else {
-          this.$message.error(`${record.no} 订阅失败，规则已关闭`)
+      handleDetail ({id}) {
+        this.$router.push({name: 'MemberDetail', query: {
+            id
+          }})
+      },
+      async onDisableChange(record){
+        if(record.status === 1){
+          this.$confirm({
+            content: `你确定要禁用${record.id}吗？`,
+            onOk: async () => {
+              const result = await userDisable(record.id);
+              if(result.success){
+                this.$message.info(`禁用成功`)
+                await this.$refs.table.refresh()
+              }else{
+                this.$message.error(result.msg)
+              }
+            }
+          })
+        }else{
+          const result = await userEnable(record.id);
+          if(result.success){
+            this.$message.info(`启用成功`)
+            await this.$refs.table.refresh()
+          }else{
+            this.$message.error(result.msg)
+          }
         }
+      },
+      exportSelect(){
+
+      },
+      exportAll(){
+        const url = '/admin/user/tz/export';
+
+      },
+      createUser(){
+
       },
       onSelectChange (selectedRowKeys, selectedRows) {
         this.selectedRowKeys = selectedRowKeys
         this.selectedRows = selectedRows
       },
-      toggleAdvanced () {
-        this.advanced = !this.advanced
-      },
-      resetSearchForm () {
-        this.queryParam = {
-          date: moment(new Date())
-        }
-      }
     }
   }
 </script>

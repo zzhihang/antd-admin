@@ -39,6 +39,7 @@
         rowKey="key"
         :columns="columns"
         :data="loadData"
+        :rowSelection="rowSelection"
         showPagination="auto"
       >
         <span slot="serial" slot-scope="text, record, index">
@@ -59,6 +60,8 @@
         :visible="visible"
         :loading="confirmLoading"
         :model="mdl"
+        :create-user-id="createUserId"
+        :create-user-url="createUserUrl"
         @cancel="handleCancel"
         @ok="handleOk"
       />
@@ -136,7 +139,7 @@
     name: 'TableList',
     components: {
       STable,
-      CreateForm
+      CreateForm,
     },
     data () {
       this.columns = columns
@@ -145,6 +148,8 @@
         visible: false,
         confirmLoading: false,
         mdl: null,
+        createUserId: '',
+        createUserUrl: '',
         queryParam: {
           queryText: '',
           status: '',
@@ -192,23 +197,28 @@
         this.mdl = { ...record }
       },
       handleOk () {
-        const form = this.$refs.createModal.form
-        this.confirmLoading = true
-        form.validateFields(async (errors, values) => {
-          if (!errors) {
-            const {data} = await userSave(values);
-            console.log(data)
-            debugger
-            this.visible = false
-            this.confirmLoading = false
-            // 重置表单数据
-            form.resetFields()
-            this.$refs.table.refresh()
-            this.$message.info('新增成功')
-          } else {
-            this.confirmLoading = false
-          }
-        })
+        if(this.createUserId){
+          this.visible = false;
+          this.createUserId = '';
+          this.createUserUrl = '';
+        }else{
+          const form = this.$refs.createModal.form
+          this.confirmLoading = true
+          form.validateFields(async (errors, values) => {
+            if (!errors) {
+              const {data} = await userSave(values);
+              this.createUserId = data.id;
+              this.createUserUrl = data.url
+              this.confirmLoading = false
+              // 重置表单数据
+              form.resetFields()
+              this.$refs.table.refresh()
+              this.$message.info('新增成功')
+            } else {
+              this.confirmLoading = false
+            }
+          })
+        }
       },
       handleCancel () {
         this.visible = false

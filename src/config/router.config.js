@@ -198,7 +198,13 @@ export const asyncRouterMap = [
             name: 'MemberList',
             component: () => import(/* webpackChunkName: "fail" */ '@/views/user/MemberList'),
             meta: { title: '会员管理', permission: ['order'] }
-          }
+          },
+          {
+            path: '/user/member/detail',
+            name: 'MemberDetail',
+            component: () => import(/* webpackChunkName: "fail" */ '@/views/user/MemberDetail'),
+            meta: { title: '查看详情', permission: ['order'] }
+          },
         ]
       },
 

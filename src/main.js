@@ -13,7 +13,7 @@ import themePluginConfig from '../config/themePluginConfig'
 
 // mock
 // WARNING: `mockjs` NOT SUPPORT `IE` PLEASE DO NOT USE IN `production` ENV.
-import './mock'
+// import './mock'
 
 import bootstrap from './core/bootstrap'
 import './core/lazy_use' // use lazy load components
@@ -29,6 +29,10 @@ Vue.use(VueAxios)
 Vue.component('pro-layout', ProLayout)
 Vue.component('page-container', PageHeaderWrapper)
 Vue.component('page-header-wrapper', PageHeaderWrapper)
+
+
+import VueClipboard from 'vue-clipboard2'
+Vue.use(VueClipboard)
 
 window.umi_plugin_ant_themeVar = themePluginConfig.theme
 
