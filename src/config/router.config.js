@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-import { UserLayout, BasicLayout, BlankLayout } from '@/layouts'
+import { UserLayout, BasicLayout } from '@/layouts'
 import { bxAnaalyse } from '@/core/icons'
 
 const RouteView = {
@@ -178,7 +178,7 @@ export const asyncRouterMap = [
         path: '/user',
         name: 'user',
         component: RouteView,
-        redirect: '/user/list',
+        redirect: '/user/blogger',
         meta: { title: '用户管理', icon: 'warning', permission: ['order'] },
         children: [
           {
@@ -248,7 +248,7 @@ export const asyncRouterMap = [
         path: '/sys',
         name: 'sys',
         component: RouteView,
-        redirect: '/sys/log',
+        redirect: '/syslog/list',
         meta: { title: '操作日志', icon: 'warning', permission: ['order'] },
         children: [
           {
@@ -260,34 +260,81 @@ export const asyncRouterMap = [
         ]
       },
 
-      // Exception
+      // content
       {
-        path: '/exception',
-        name: 'exception',
+        path: '/permission',
+        name: 'permission',
         component: RouteView,
-        redirect: '/exception/403',
-        meta: { title: 'menu.exception', icon: 'warning', permission: ['exception'] },
+        redirect: '/permission/user',
+        meta: { title: '权限管理', icon: 'warning', permission: ['order'] },
         children: [
           {
-            path: '/exception/403',
-            name: 'Exception403',
-            component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/403'),
-            meta: { title: 'menu.exception.not-permission', permission: ['exception'] }
+            path: '/permission/role',
+            name: 'RoleList',
+            component: () => import('@/views/permission/RoleList'),
+            meta: { title: '角色管理', keepAlive: true }
           },
           {
-            path: '/exception/404',
-            name: 'Exception404',
-            component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404'),
-            meta: { title: 'menu.exception.not-find', permission: ['exception'] }
+            path: '/permission/user',
+            name: 'UserList',
+            component: () => import('@/views/permission/UserList'),
+            meta: { title: '账号管理', keepAlive: true }
           },
           {
-            path: '/exception/500',
-            name: 'Exception500',
-            component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/500'),
-            meta: { title: 'menu.exception.server-error', permission: ['exception'] }
-          }
+            path: '/permission/dictionary',
+            name: 'dictionary',
+            component: () => import('@/views/permission/dictionary/dictionary'),
+            meta: { title: '字典管理', keepAlive: true }
+          },{
+            path: '/permission/detail_1236',
+            name: 'detail_1236',
+            hidden: true,
+            component: () => import('@/views/permission/dictionary/detail_1236'),
+            meta: { title: '字典详情', keepAlive: true }
+          },{
+            path: '/permission/detail_4',
+            name: 'detail_4',
+            hidden: true,
+            component: () => import('@/views/permission/dictionary/detail_4'),
+            meta: { title: '字典详情', keepAlive: true }
+          },{
+            path: '/permission/detail_5',
+            name: 'detail_5',
+            hidden: true,
+            component: () => import('@/views/permission/dictionary/detail_5'),
+            meta: { title: '字典详情', keepAlive: true }
+          },
         ]
       },
+
+      // // Exception
+      // {
+      //   path: '/exception',
+      //   name: 'exception',
+      //   component: RouteView,
+      //   redirect: '/exception/403',
+      //   meta: { title: 'menu.exception', icon: 'warning', permission: ['exception'] },
+      //   children: [
+      //     {
+      //       path: '/exception/403',
+      //       name: 'Exception403',
+      //       component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/403'),
+      //       meta: { title: 'menu.exception.not-permission', permission: ['exception'] }
+      //     },
+      //     {
+      //       path: '/exception/404',
+      //       name: 'Exception404',
+      //       component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404'),
+      //       meta: { title: 'menu.exception.not-find', permission: ['exception'] }
+      //     },
+      //     {
+      //       path: '/exception/500',
+      //       name: 'Exception500',
+      //       component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/500'),
+      //       meta: { title: 'menu.exception.server-error', permission: ['exception'] }
+      //     }
+      //   ]
+      // },
 
       // account
       {

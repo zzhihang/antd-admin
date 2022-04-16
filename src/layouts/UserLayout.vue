@@ -10,12 +10,12 @@
           <div class="header">
             <a href="/">
               <img src="~@/assets/logo.svg" class="logo" alt="logo">
-              <span class="title">Ant Design</span>
+              <span class="title">知识付费后台管理</span>
             </a>
           </div>
-          <div class="desc">
-            {{ $t('layouts.userLayout.title') }}
-          </div>
+          <!--<div class="desc">-->
+            <!--{{ $t('layouts.userLayout.title') }}-->
+          <!--</div>-->
         </div>
 
         <router-view />
@@ -27,7 +27,7 @@
             <a href="_self">条款</a>
           </div>
           <div class="copyright">
-            Copyright &copy; 2018 vueComponent
+            Copyright &copy; 2022
           </div>
         </div>
       </div>

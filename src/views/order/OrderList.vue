@@ -294,7 +294,7 @@
       }
     },
     methods: {
-      handleDetail(record){debugger
+      handleDetail(record){
         this.mdl = record;
         this.visible = true;
       },

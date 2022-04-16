@@ -126,7 +126,7 @@
       this.getUserInfo()
     },
     watch: {
-      subscribeTime(val){debugger
+      subscribeTime(val){
         this.queryParam.subscribeStart = val[0].format('YYYY-MM-DD')
         this.queryParam.subscribeEnd = val[1].format('YYYY-MM-DD')
       }

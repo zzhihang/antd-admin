@@ -182,7 +182,7 @@
           if (!errors) {
             values.id = this.mdl.id;
             console.log(values)
-            debugger
+
             const result = await auditContent(values);
             this.confirmLoading = false
             if(result.success){
