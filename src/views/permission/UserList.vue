@@ -4,22 +4,22 @@
       <a-form layout="inline">
         <a-row :gutter="48">
           <a-col :md="8" :sm="24">
-            <a-form-item label="角色ID">
-              <a-input placeholder="请输入"/>
+            <a-form-item label="用户信息">
+              <a-input placeholder="请输入用户ID、昵称、手机号"/>
             </a-form-item>
           </a-col>
           <a-col :md="8" :sm="24">
-            <a-form-item label="状态">
-              <a-select placeholder="请选择" default-value="0">
-                <a-select-option value="0">全部</a-select-option>
-                <a-select-option value="1">关闭</a-select-option>
-                <a-select-option value="2">运行中</a-select-option>
+            <a-form-item label="角色">
+              <a-select placeholder="请选择" default-value="">
+                <a-select-option value="">全部</a-select-option>
+                <a-select-option v-for="(item, index) in roleList"  :value="item.id" :key="index">{{item.name}}</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
           <a-col :md="8" :sm="24">
             <span class="table-page-search-submitButtons">
-              <a-button type="primary">查询</a-button>
+              <a-button type="primary" @click="onCreateClick">创建账号</a-button>
+              <a-button type="primary" style="margin-left: 16px">查询</a-button>
               <a-button style="margin-left: 8px">重置</a-button>
             </span>
           </a-col>
@@ -29,73 +29,33 @@
 
     <s-table
       row-key="id"
+      ref="table"
       size="default"
       :columns="columns"
       :data="loadData"
-      :expandedRowKeys="expandedRowKeys"
-      @expand="handleExpand"
     >
-      <div
-        slot="expandedRowRender"
-        slot-scope="record"
-        style="margin: 0">
-        <a-row
-          :gutter="24"
-          :style="{ marginBottom: '12px' }">
-          <a-col :span="12" v-for="(role, index) in record.permissions" :key="index" :style="{ marginBottom: '12px', height: '23px' }">
-            <a-col :lg="4" :md="24">
-              <span>{{ role.permissionName }}：</span>
-            </a-col>
-            <a-col :lg="20" :md="24" v-if="role.actionList && role.actionList.length > 0">
-              <a-tag color="cyan" v-for="action in role.actionList" :key="action">{{ action | permissionFilter }}</a-tag>
-            </a-col>
-            <a-col :span="20" v-else>-</a-col>
-          </a-col>
-        </a-row>
-      </div>
-      <a-tag color="blue" slot="status" slot-scope="text">{{ text | statusFilter }}</a-tag>
+      <a-switch slot="status" slot-scope="text, record, index" :checked="String(text) === '1'" checked-children="启用中" un-checked-children="禁用中" @change="onDisableChange(record)"/>
       <span slot="createTime" slot-scope="text">{{ text | moment }}</span>
       <span slot="action" slot-scope="text, record">
         <a @click="handleEdit(record)">编辑</a>
-        <a-divider type="vertical" />
-        <a-dropdown>
-          <a class="ant-dropdown-link">
-            更多 <a-icon type="down" />
-          </a>
-          <a-menu slot="overlay">
-            <a-menu-item>
-              <a href="javascript:;">详情</a>
-            </a-menu-item>
-            <a-menu-item>
-              <a href="javascript:;">禁用</a>
-            </a-menu-item>
-            <a-menu-item>
-              <a href="javascript:;">删除</a>
-            </a-menu-item>
-          </a-menu>
-        </a-dropdown>
       </span>
     </s-table>
 
     <a-modal
-      title="操作"
+      title="添加人员"
       style="top: 20px;"
       :width="800"
       v-model="visible"
+      cancelText="取消"
+      okText="保存"
       @ok="handleOk"
     >
       <a-form class="permission-form" :form="form">
-
         <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="唯一识别码"
-          hasFeedback
-          validateStatus="success"
+          style="display: none;"
+          label="id"
         >
           <a-input
-            placeholder="唯一识别码"
-            disabled="disabled"
             v-decorator="['id']"
           />
         </a-form-item>
@@ -103,58 +63,47 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="角色名称"
-          hasFeedback
-          validateStatus="success"
+          label="用户ID"
         >
           <a-input
-            placeholder="起一个名字"
-            v-decorator="['name']"
+            placeholder="唯一识别码"
+            :disabled="currentAction === 'edit'"
+            v-decorator="['uid', {rules: [{required: true, message: '请输入'}]}]"
           />
         </a-form-item>
 
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="状态"
-          hasFeedback
-          validateStatus="warning"
+          label="后台管理账号密码"
         >
-          <a-select v-decorator="['status', { initialValue: 1 }]">
-            <a-select-option :value="1">正常</a-select-option>
-            <a-select-option :value="2">禁用</a-select-option>
+          <a-input
+            placeholder="请输入登录密码"
+            v-decorator="['passwd', {rules: [{required: true, message: '请输入'}]}]"
+          />
+        </a-form-item>
+
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+          label="手机号"
+        >
+          <a-input
+            placeholder="请输入手机号"
+            v-decorator="['phone', {rules: [{required: true, message: '请输入'}]}]"
+          />
+        </a-form-item>
+
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+          placeholder="请选择角色"
+          label="角色"
+        >
+          <a-select v-decorator="['role', {rules: [{required: true, message: '请选择'}]}]">
+            <a-select-option v-for="(item, index) in roleList" :key="index" :value="item.id">{{item.name}}</a-select-option>
           </a-select>
         </a-form-item>
-
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="描述"
-          hasFeedback
-        >
-          <a-textarea
-            :rows="5"
-            placeholder="..."
-            id="describe"
-            v-decorator="['describe']"
-          />
-        </a-form-item>
-
-        <a-divider>拥有权限</a-divider>
-        <template v-for="permission in permissions">
-          <a-form-item
-            class="permission-group"
-            v-if="permission.actionsOptions && permission.actionsOptions.length > 0"
-            :labelCol="labelCol"
-            :wrapperCol="wrapperCol"
-            :key="permission.permissionId"
-            :label="permission.permissionName"
-          >
-            <a-checkbox>全选</a-checkbox>
-            <a-checkbox-group v-decorator="[`permissions.${permission.permissionId}`]" :options="permission.actionsOptions"/>
-          </a-form-item>
-        </template>
-
       </a-form>
     </a-modal>
 
@@ -162,179 +111,143 @@
 </template>
 
 <script>
-import pick from 'lodash.pick'
-import { STable } from '@/components'
-import { getRoleList, getServiceList } from '@/api/manage'
-import { PERMISSION_ENUM } from '@/core/permission/permission'
+  import pick from 'lodash.pick'
+  import { STable } from '@/components'
+  import { sysRoleList, sysUserDisable, sysUserEnable, sysUserList, sysUserSave } from '@/api/permissionService'
 
-const STATUS = {
-  1: '启用',
-  2: '禁用'
-}
+  const columns = [
+    {
+      title: '序号',
+      dataIndex: 'id'
+    },
+    {
+      title: '用户ID',
+      dataIndex: 'uid'
+    },
+    {
+      title: '用户昵称',
+      dataIndex: 'name'
+    },
+    {
+      title: '手机号',
+      dataIndex: 'phone'
+    },
+    {
+      title: '角色',
+      dataIndex: 'roleName'
+    },
+    {
+      title: '账号状态',
+      dataIndex: 'status',
+      scopedSlots: { customRender: 'status' }
+    },
+    {
+      title: '操作',
+      width: '150px',
+      dataIndex: 'action',
+      scopedSlots: { customRender: 'action' }
+    }
+  ]
 
-const columns = [
-  {
-    title: '唯一识别码',
-    dataIndex: 'id'
-  },
-  {
-    title: '角色名称',
-    dataIndex: 'name'
-  },
-  {
-    title: '状态',
-    dataIndex: 'status',
-    scopedSlots: { customRender: 'status' }
-  },
-  {
-    title: '创建时间',
-    dataIndex: 'createTime',
-    scopedSlots: { customRender: 'createTime' },
-    sorter: true
-  }, {
-    title: '操作',
-    width: '150px',
-    dataIndex: 'action',
-    scopedSlots: { customRender: 'action' }
-  }
-]
+  export default {
+    name: 'TableList',
+    components: {
+      STable
+    },
+    data() {
+      return {
+        currentAction: 'add',
+        roleList: [],
+        visible: false,
+        labelCol: {
+          xs: { span: 24 },
+          sm: { span: 5 }
+        },
+        wrapperCol: {
+          xs: { span: 24 },
+          sm: { span: 16 }
+        },
+        form: this.$form.createForm(this),
+        permissions: [],
 
-export default {
-  name: 'TableList',
-  components: {
-    STable
-  },
-  data () {
-    return {
-      description: '列表使用场景：后台管理中的权限管理以及角色管理，可用于基于 RBAC 设计的角色权限控制，颗粒度细到每一个操作类型。',
+        queryParam: {},
+        columns,
+        loadData: parameter => {
+          return sysUserList(parameter)
+            .then(res => {
+              return res.data
+            })
+        },
 
-      visible: false,
-      labelCol: {
-        xs: { span: 24 },
-        sm: { span: 5 }
+      }
+    },
+    created() {
+      this.queryRoleList();
+    },
+    methods: {
+      async queryRoleList() {
+        const { data } = await sysRoleList();
+        this.roleList = data
       },
-      wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 16 }
-      },
-      form: this.$form.createForm(this),
-      permissions: [],
-
-      // 高级搜索 展开/关闭
-      advanced: false,
-      // 查询参数
-      queryParam: {},
-      // 表头
-      columns,
-      // 加载数据方法 必须为 Promise 对象
-      loadData: parameter => {
-        return getRoleList(parameter)
-          .then(res => {
-            console.log('getRoleList', res)
-            // 展开全部行
-            this.expandedRowKeys = res.result.data.map(item => item.id)
-            return res.result
+      async onDisableChange(record){
+        if(record.status === 1){
+          this.$confirm({
+            content: `你确定要禁用${record.phone}吗？`,
+            onOk: async () => {
+              const result = await sysUserDisable(record.id);
+              if(result.success){
+                this.$message.info(`禁用成功`)
+                await this.$refs.table.refresh()
+              }else{
+                this.$message.error(result.msg)
+              }
+            }
           })
-      },
-
-      expandedRowKeys: [],
-      selectedRowKeys: [],
-      selectedRows: []
-    }
-  },
-  filters: {
-    statusFilter (key) {
-      return STATUS[key]
-    },
-    permissionFilter (key) {
-      const permission = PERMISSION_ENUM[key]
-      return permission && permission.label
-    }
-  },
-  created () {
-    getServiceList().then(res => {
-      console.log('getServiceList.call()', res)
-    })
-
-    getRoleList().then(res => {
-      console.log('getRoleList.call()', res)
-    })
-  },
-  methods: {
-    handleEdit (record) {
-      this.visible = true
-      console.log('record', record)
-
-      const checkboxGroup = {}
-      this.permissions = record.permissions.map(permission => {
-        const groupKey = `permissions.${permission.permissionId}`
-        checkboxGroup[groupKey] = permission.actionList
-        const actionsOptions = permission.actionEntitySet.map(action => {
-          return {
-            label: action.describe,
-            value: action.action,
-            defaultCheck: action.defaultCheck
+        }else{
+          const result = await sysUserEnable(record.id);
+          if(result.success){
+            this.$message.info(`启用成功`)
+            await this.$refs.table.refresh()
+          }else{
+            this.$message.error(result.msg)
           }
-        })
-        return {
-          ...permission,
-          actionsOptions
         }
-      })
-
-      this.$nextTick(() => {
-        console.log('permissions', this.permissions)
-        console.log('checkboxGroup', checkboxGroup)
-
-        this.form.setFieldsValue(pick(record, ['id', 'status', 'describe', 'name']))
-        this.form.setFieldsValue(checkboxGroup)
-      })
-    },
-    handleOk (e) {
-      e.preventDefault()
-      this.form.validateFields((err, values) => {
-        console.log(err, values)
-      })
-    },
-    onChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys
-      this.selectedRows = selectedRows
-    },
-    handleExpand (expanded, record) {
-      console.log('expanded', expanded, record)
-      if (expanded) {
-        this.expandedRowKeys.push(record.id)
-      } else {
-        this.expandedRowKeys = this.expandedRowKeys.filter(item => record.id !== item)
-      }
-    },
-    toggleAdvanced () {
-      this.advanced = !this.advanced
-    }
-  },
-  watch: {
-    /*
-      'selectedRows': function (selectedRows) {
-        this.needTotalList = this.needTotalList.map(item => {
-          return {
-            ...item,
-            total: selectedRows.reduce( (sum, val) => {
-              return sum + val[item.dataIndex]
-            }, 0)
+      },
+      handleEdit(record) {
+        this.currentAction = 'edit';
+        this.visible = true
+        this.$nextTick(() => {
+          this.form.setFieldsValue(pick(record, ['id', 'uid', 'passwd', 'role', 'name', 'phone']))
+        })
+      },
+      onCreateClick(){
+        this.currentAction = 'add';
+        this.visible = true;
+        this.form.resetFields();
+      },
+      handleOk(e) {
+        e.preventDefault()
+        this.form.validateFields(async (err, values) => {
+          const result = await sysUserSave(values);
+          this.visible = false;
+          if(result.success){
+            this.$message.success('操作成功');
+            await this.$refs.table.refresh()
+          }else{
+            this.$message.error(result.msg);
           }
         })
-      }
-      */
+      },
+    },
   }
-}
 </script>
 
 <style lang="less" scoped>
-.permission-form {
-  /deep/ .permission-group {
-    margin-top: 0;
-    margin-bottom: 0;
+  .permission-form {
+    /deep/ .permission-group {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
   }
-}
 
 </style>

@@ -5,20 +5,21 @@
         <a-form layout="inline">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
-              <a-form-item label="用户ID、手机号">
-                <a-input v-model="queryParam.queryText" placeholder=""/>
+              <a-form-item label="用户信息">
+                <a-input v-model="queryParam.queryText" placeholder="请输入用户ID、昵称、手机号、微信号"/>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
               <a-form-item label="角色">
-                <a-select v-model="queryParam.role" placeholder="请选择" default-value="0">
-                  <a-select-option  v-for="(item, index) in CONTENT_STATUS" :key="index" :value="item.value">{{item.text}}</a-select-option>
+                <a-select v-model="queryParam.role" placeholder="请选择">
+                  <a-select-option value="">全部</a-select-option>
+                  <a-select-option v-for="(item, index) in roleList" :key="index" :value="item.id">{{item.name}}</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
               <a-form-item label="操作时间">
-                <a-range-picker v-model:value="queryParam.ctime" />
+                <a-range-picker v-model:value="ctime" />
               </a-form-item>
             </a-col>
             <a-col :md="24" :sm="24" style="text-align: right">
@@ -41,17 +42,7 @@
         <span slot="serial" slot-scope="text, record, index">
           {{ index + 1 }}
         </span>
-        <span slot="status" slot-scope="text">
-          <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
-        </span>
 
-        <span slot="action" slot-scope="text, record">
-          <template>
-            <a @click="handleEdit(record)">配置</a>
-            <a-divider type="vertical" />
-            <a @click="handleSub(record)">订阅报警</a>
-          </template>
-        </span>
       </s-table>
     </a-card>
   </page-header-wrapper>
@@ -62,6 +53,7 @@
   import { STable } from '@/components'
   import { CONTENT_STATUS } from '@/utils/dict'
   import { getSysLogList } from '@/api/sysService'
+  import { sysRoleList } from '@/api/permissionService'
 
   const columns = [
     {
@@ -93,46 +85,31 @@
     }
   ]
 
-  const statusMap = {
-    0: {
-      status: 'default',
-      text: '关闭'
-    },
-    1: {
-      status: 'processing',
-      text: '运行中'
-    },
-    2: {
-      status: 'success',
-      text: '已上线'
-    },
-    3: {
-      status: 'error',
-      text: '异常'
-    }
-  }
-
   export default {
     name: 'TableList',
     components: {
       STable,
     },
+    created(){
+      sysRoleList().then(({data}) => {
+        this.roleList = data;
+      })
+    },
     data () {
       this.columns = columns
       return {
+        roleList: [],
         CONTENT_STATUS: CONTENT_STATUS,
         visible: false,
         confirmLoading: false,
         mdl: null,
-        // 高级搜索 展开/关闭
         advanced: false,
-        // 查询参数
+        ctime: '',
         queryParam: {
           queryText: '',
           role: '',
           ctimeStart: '',
           ctimeEnd: '',
-          ctime: '',
         },
         // 加载数据方法 必须为 Promise 对象
         loadData: parameter => {
@@ -146,20 +123,10 @@
         selectedRows: []
       }
     },
-    filters: {
-      statusFilter (type) {
-        return statusMap[type].text
-      },
-      statusTypeFilter (type) {
-        return statusMap[type].status
-      }
-    },
-    computed: {
-      rowSelection () {
-        return {
-          selectedRowKeys: this.selectedRowKeys,
-          onChange: this.onSelectChange
-        }
+    watch: {
+      ctime(val){
+        this.queryParam.ctimeStart = val[0].format('YYYY-MM-DD')
+        this.queryParam.ctimeEnd = val[1].format('YYYY-MM-DD')
       }
     },
     methods: {
@@ -221,25 +188,9 @@
         const form = this.$refs.createModal.form
         form.resetFields() // 清理表单数据（可不做）
       },
-      handleSub (record) {
-        if (record.status !== 0) {
-          this.$message.info(`${record.no} 订阅成功`)
-        } else {
-          this.$message.error(`${record.no} 订阅失败，规则已关闭`)
-        }
-      },
-      onSelectChange (selectedRowKeys, selectedRows) {
-        this.selectedRowKeys = selectedRowKeys
-        this.selectedRows = selectedRows
-      },
       toggleAdvanced () {
         this.advanced = !this.advanced
       },
-      resetSearchForm () {
-        this.queryParam = {
-          date: moment(new Date())
-        }
-      }
     }
   }
 </script>

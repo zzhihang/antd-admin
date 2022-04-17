@@ -4,19 +4,17 @@ import { Icon, Menu, Dropdown } from 'ant-design-vue'
 import { i18nRender } from '@/locales'
 import i18nMixin from '@/store/i18n-mixin'
 
-const locales = ['zh-CN', 'zh-TW', 'en-US', 'pt-BR']
+const locales = ['zh-CN', 'en-US', 'pt-BR']
 const languageLabels = {
   'zh-CN': '简体中文',
-  'zh-TW': '繁体中文',
-  'en-US': 'English',
-  'pt-BR': 'Português'
+  // 'en-US': 'English',
+  // 'pt-BR': 'Português'
 }
 // eslint-disable-next-line
 const languageIcons = {
   'zh-CN': '🇨🇳',
-  'zh-TW': '🇭🇰',
-  'en-US': '🇺🇸',
-  'pt-BR': '🇧🇷'
+  // 'en-US': '🇺🇸',
+  // 'pt-BR': '🇧🇷'
 }
 
 const SelectLang = {
@@ -33,6 +31,7 @@ const SelectLang = {
     const changeLang = ({ key }) => {
       this.setLang(key)
     }
+    this.setLang('zh-CN')
     const langMenu = (
       <Menu class={['menu', 'ant-pro-header-menu']} selectedKeys={[this.currentLang]} onClick={changeLang}>
         {locales.map(locale => (

@@ -5,20 +5,39 @@
         <a-form layout="inline">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
-              <a-form-item label="用户ID、手机号">
-                <a-input v-model="queryParam.queryText" placeholder=""/>
+              <a-form-item label="用户信息">
+                <a-input v-model="queryParam.queryText" placeholder="请输入用户ID、昵称、手机号、微信号"/>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
-              <a-form-item label="支付状态">
-                <a-select v-model="queryParam.status" placeholder="请选择" default-value="0">
-                  <a-select-option  v-for="(item, index) in CONTENT_STATUS" :key="index" :value="item.value">{{item.text}}</a-select-option>
+              <a-form-item label="禁用状态">
+                <a-select v-model="queryParam.status" placeholder="请选择" default-value="">
+                  <a-select-option  v-for="(item, index) in ENABLE_STATUS" :key="index" :value="item.value">{{item.text}}</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
-              <a-form-item label="订单创建时间">
-                <a-range-picker v-model:value="queryParam.ctime" />
+              <a-form-item label="订阅类型">
+                <a-select v-model="queryParam.subscribeType" placeholder="请选择" default-value="">
+                  <a-select-option  v-for="(item, index) in BUSINESS_TYPE" :key="index" :value="item.value">{{item.text}}</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
+              <a-form-item label="订阅状态">
+                <a-select v-model="queryParam.subscribeStatus" placeholder="请选择" default-value="">
+                  <a-select-option  v-for="(item, index) in SUBSCRIBE_STATUS" :key="index" :value="item.value">{{item.text}}</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
+              <a-form-item label="注册时间">
+                <a-range-picker v-model:value="ctime" />
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
+              <a-form-item label="订阅时间">
+                <a-range-picker v-model:value="subscribeTime" />
               </a-form-item>
             </a-col>
             <a-col :md="24" :sm="24" style="text-align: right">
@@ -38,6 +57,7 @@
         size="default"
         rowKey="key"
         :columns="columns"
+        :rowSelection="rowSelection"
         :data="loadData"
         showPagination="auto"
       >
@@ -61,7 +81,6 @@
         :model="mdl"
         :create-user-id="createUserId"
         :create-user-url="createUserUrl"
-        :rowSelection="rowSelection"
         @cancel="handleCancel"
         @ok="handleOk"
       />
@@ -72,7 +91,7 @@
 <script>
   import { STable } from '@/components'
   import { getRoleList } from '@/api/manage'
-  import { CONTENT_STATUS } from '@/utils/dict'
+  import { BUSINESS_TYPE, SUBSCRIBE_STATUS, ENABLE_STATUS } from '@/utils/dict'
   import { getMemberList, userDisable, userEnable, userSave } from '@/api/userService'
   import CreateForm from './modules/CreateForm'
 
@@ -127,6 +146,7 @@
     },{
       title: '禁用账户',
       dataIndex: 'status',
+      width: 150,
       scopedSlots: { customRender: 'disable' }
     },
     {
@@ -165,18 +185,25 @@
     data () {
       this.columns = columns
       return {
-        CONTENT_STATUS: CONTENT_STATUS,
+        ENABLE_STATUS: [{text: '全部', value: ''}].concat(ENABLE_STATUS),
+        BUSINESS_TYPE: [{text: '全部', value: ''}].concat(BUSINESS_TYPE),
+        SUBSCRIBE_STATUS: [{text: '全部', value: ''}].concat(SUBSCRIBE_STATUS),
         visible: false,
         confirmLoading: false,
         mdl: null,
         createUserId: '',
         createUserUrl: '',
+        subscribeTime: '',
+        ctime: '',
         queryParam: {
           queryText: '',
           status: '',
-          ctimeStart: '',
-          ctimeEnd: '',
-          ctime: '',
+          startTime: '',
+          subscribeStatus: '',
+          subscribeType: '',
+          endTime: '',
+          subscribeStart: '',
+          subscribeEnd: '',
         },
         loadData: parameter => {
           const requestParameters = Object.assign({}, parameter, this.queryParam)
@@ -275,12 +302,19 @@
           }
         }
       },
-      exportSelect(){
-
+      exportSelect() {
+        if(!this.selectedRows.length){
+          return this.$message.warn('请先选择要导出的数据')
+        }
+        const ids = this.selectedRows.map(item => item.id);
+        this.exportAll(ids);
       },
-      exportAll(){
-        const url = '/admin/user/tz/export';
-
+      exportAll(id) {
+        let url = 'http://admin.shouzimu.xyz/api/admin/user/pt/export';
+        if(id.push){
+          url = 'http://admin.shouzimu.xyz/api/admin/user/pt/export?id=' + id.join(',');
+        }
+        window.open(url, '_blank')
       },
       createUser(){
 
@@ -289,7 +323,17 @@
         this.selectedRowKeys = selectedRowKeys
         this.selectedRows = selectedRows
       },
-    }
+    },
+    watch: {
+      ctime(val){
+        this.queryParam.startTime = val[0].format('YYYY-MM-DD')
+        this.queryParam.endTime = val[1].format('YYYY-MM-DD')
+      },
+      subscribeTime(val){
+        this.queryParam.subscribeStart = val[0].format('YYYY-MM-DD')
+        this.queryParam.subscribeEnd = val[1].format('YYYY-MM-DD')
+      }
+    },
   }
 </script>
 <style lang="less" scoped>

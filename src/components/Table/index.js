@@ -1,6 +1,6 @@
 import T from 'ant-design-vue/es/table/Table'
 import get from 'lodash.get'
-
+import cloneDeep from 'lodash.clonedeep'
 export default {
   data () {
     return {
@@ -15,7 +15,12 @@ export default {
 
       // 存储表格onchange时的filters， sorter对象
       filters: {},
-      sorter: {}
+      sorter: {},
+
+      //自定义表头相关
+      columnsChecked: [],
+      checkboxList: [],
+      popVisible: false
     }
   },
   props: Object.assign({}, T.props, {
@@ -111,6 +116,9 @@ export default {
     }
   },
   created () {
+    this.columnsOrigin = cloneDeep(this.columns);
+    this.columnsChecked = this.columns.map(item => item.title);
+    this.checkboxList = this.columns.map(item => item.title);
     const { pageNo } = this.$route.params
     const localPageNum = this.pageURI && (pageNo && parseInt(pageNo)) || this.pageNum
     this.localPagination = ['auto', true].includes(this.showPagination) && Object.assign({}, this.localPagination, {
@@ -122,6 +130,23 @@ export default {
     this.loadData()
   },
   methods: {
+    onCheckChange(e){
+      this.columnsChecked = e;
+    },
+    createColumns(){
+      if (this.columnsChecked.length === 0) {
+        return this.$message.error('请至少留下一列')
+      }
+      let result = []
+      this.columnsChecked.forEach(item => {
+        let col = this.columnsOrigin.find(f => f.title === item)
+        if (col) {
+          result.push(col)
+        }
+      })
+      this.popVisible = false;
+      this.columns = result
+    },
     /**
      * 表格重新加载方法
      * 如果参数为 true, 则强制刷新到第一页
@@ -314,8 +339,21 @@ export default {
     )
 
     return (
-      <div class="table-wrapper">
+      <div class="table-wrapper" style={{position: 'relative'}}>
         { showAlert ? this.renderAlert() : null }
+        <div style={{textAlign: 'right'}}>
+          {<a-popover title="自定义显示列" trigger="hover" placement="bottomLeft" style={{marginBottom: '10px'}}>
+            <template slot="content">
+              <a-checkbox-group class="my-checkbox" value={this.columnsChecked} options={this.checkboxList} onChange={this.onCheckChange} />
+              <div style="margin-top: 10px;text-align: right">
+                <a-button style="margin-left: 8px" size="small" type="primary" onClick={this.createColumns}>保存</a-button>
+              </div>
+            </template>
+            <div class="my-set" style={{position: 'absolute', top: '16px', right: '20px', zIndex: 999}}>
+              <a-icon type="setting" style="{ fontSize: '30px', color: 'red'}" />
+            </div>
+          </a-popover>}
+        </div>
         { table }
       </div>
     )

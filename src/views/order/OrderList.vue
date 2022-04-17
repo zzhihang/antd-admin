@@ -5,13 +5,13 @@
         <a-form layout="inline">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
-              <a-form-item label="用户ID、订单号、手机号">
-                <a-input v-model="queryParam.queryText" placeholder=""/>
+              <a-form-item label="用户信息">
+                <a-input v-model="queryParam.queryText" placeholder="用户ID、订单号、手机号"/>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
               <a-form-item label="支付状态">
-                <a-select v-model="queryParam.payStatus" placeholder="请选择" default-value="0">
+                <a-select v-model="queryParam.payStatus" placeholder="全部">
                   <a-select-option  v-for="(item, index) in PAY_STATUS" :key="index" :value="item.value">{{item.text}}</a-select-option>
                 </a-select>
               </a-form-item>
@@ -19,15 +19,22 @@
             <template v-if="advanced">
               <a-col :md="8" :sm="24">
                 <a-form-item label="支付方式">
-                  <a-select v-model="queryParam.payType" placeholder="请选择" default-value="0">
+                  <a-select v-model="queryParam.payType" placeholder="请选择">
                     <a-select-option  v-for="(item, index) in PAY_TYPE" :key="index" :value="item.value">{{item.text}}</a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
               <a-col :md="8" :sm="24">
                 <a-form-item label="订阅类型">
-                  <a-select v-model="queryParam.businessType" placeholder="请选择" default-value="0">
+                  <a-select v-model="queryParam.businessType" placeholder="请选择">
                     <a-select-option  v-for="(item, index) in BUSINESS_TYPE" :key="index" :value="item.value">{{item.text}}</a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+              <a-col :md="8" :sm="24">
+                <a-form-item label="订阅类型">
+                  <a-select v-model="queryParam.orderType" placeholder="请选择">
+                    <a-select-option  v-for="(item, index) in ORDER_TYPE" :key="index" :value="item.value">{{item.text}}</a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -40,27 +47,25 @@
               </a-col>
               <a-col :md="8" :sm="24">
                 <a-form-item label="订单创建时间">
-                  <a-range-picker v-model:value="queryParam.ctime" />
+                  <a-range-picker v-model:value="ctime" />
                 </a-form-item>
               </a-col>
               <a-col :md="8" :sm="24">
                 <a-form-item label="订单交易时间">
-                  <a-input v-model="queryParam.payStart" placeholder=""/>
-                  <span>到</span>
-                  <a-input v-model="queryParam.payTimeEnd" placeholder=""/>
+                  <a-range-picker v-model:value="payTime" />
                 </a-form-item>
               </a-col>
               <a-col :md="8" :sm="24">
                 <a-form-item label="博主ID、昵称、手机号">
-                  <a-input v-model="queryParam.queryText" placeholder=""/>
+                  <a-input v-model="queryParam.tzQuery" placeholder=""/>
                 </a-form-item>
               </a-col>
             </template>
             <a-col :md="!advanced && 8 || 24" :sm="24">
               <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
                 <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
-                <a-button style="margin-left: 8px" type="primary" @click="$refs.table.refresh(true)">导出</a-button>
-                <a-button style="margin-left: 8px" type="primary" @click="$refs.table.refresh(true)">全部导出</a-button>
+                <a-button style="margin-left: 8px" type="primary" @click="exportSelect">导出</a-button>
+              <a-button style="margin-left: 8px" type="primary" @click="exportAll">全部导出</a-button>
                 <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
                 <a @click="toggleAdvanced" style="margin-left: 8px">
                   {{ advanced ? '收起' : '展开' }}
@@ -132,7 +137,8 @@
 
   import OrderDetail from './modules/OrderDetail'
   import { getOrderList } from '@/api/orderService'
-  import { BUSINESS_TYPE, PAY_STATUS, PAY_TYPE } from '@/utils/dict'
+  import { BUSINESS_TYPE, PAY_STATUS, PAY_TYPE, ORDER_TYPE } from '@/utils/dict'
+  import { getTextByValue } from '@/utils/dictUtils'
 
   const columns = [
     {
@@ -180,10 +186,12 @@
       dataIndex: 'businessTitle',
     },{
       title: '订阅类型',
-      dataIndex: 'orderType',
+      dataIndex: 'businessType',
+      customRender: (text) => getTextByValue(text, 'BUSINESS_TYPE')
     },{
       title: '交易类型',
-      dataIndex: 'businessType',
+      dataIndex: 'orderType',
+      customRender: (text) => getTextByValue(text, 'ORDER_TYPE')
     },{
       title: '支付方式',
       dataIndex: 'payType',
@@ -238,13 +246,15 @@
         PAY_STATUS: PAY_STATUS,
         PAY_TYPE: PAY_TYPE,
         BUSINESS_TYPE: BUSINESS_TYPE,
+        ORDER_TYPE: ORDER_TYPE,
         visible: false,
         detailModalShow: false,
         confirmLoading: false,
         mdl: {},
         // 高级搜索 展开/关闭
         advanced: false,
-        // 查询参数
+        ctime: '',
+        payTime: '',
         queryParam: {
           queryText: '',
           payStatus: '',
@@ -258,8 +268,6 @@
           payStart: '',
           payTimeEnd: '',
           tzQuery: '',
-          ctime: '',
-          payTime: ''
         },
         // 加载数据方法 必须为 Promise 对象
         loadData: parameter => {
@@ -322,8 +330,32 @@
         this.queryParam = {
           date: moment(new Date())
         }
+      },
+      exportSelect() {
+        if(!this.selectedRows.length){
+          return this.$message.warn('请先选择要导出的数据')
+        }
+        const ids = this.selectedRows.map(item => item.id);
+        this.exportAll(ids);
+      },
+      exportAll(id) {
+        let url = 'http://admin.shouzimu.xyz/api/admin/order/export';
+        if(id.push){
+          url = 'http://admin.shouzimu.xyz/api/admin/order/export?id=' + id.join(',');
+        }
+        window.open(url, '_blank')
+      },
+    },
+    watch: {
+      ctime(val){
+        this.queryParam.startTime = val[0].format('YYYY-MM-DD')
+        this.queryParam.endTime = val[1].format('YYYY-MM-DD')
+      },
+      payTime(val){
+        this.queryParam.payStart = val[0].format('YYYY-MM-DD')
+        this.queryParam.payTimeEnd = val[1].format('YYYY-MM-DD')
       }
-    }
+    },
   }
 </script>
 <style lang="less" scoped>

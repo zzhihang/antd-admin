@@ -52,7 +52,9 @@ const user = {
       return new Promise((resolve, reject) => {
         getInfo().then(response => {
           const result = response.data
-
+          commit('SET_INFO', result)
+          commit('SET_NAME', { name: result.name, welcome: welcome() })
+          commit('SET_AVATAR', result.avatar)
           // if (result.role && result.role.permissions.length > 0) {
           //   const role = result.role
           //   role.permissions = result.role.permissions

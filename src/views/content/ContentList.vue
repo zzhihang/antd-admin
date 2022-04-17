@@ -5,20 +5,21 @@
         <a-form layout="inline">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
-              <a-form-item label="用户ID、手机号">
-                <a-input v-model="queryParam.queryText" placeholder=""/>
+              <a-form-item label="用户信息">
+                <a-input v-model="queryParam.queryText" placeholder="请输入用户ID、手机号"/>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
-              <a-form-item label="支付状态">
-                <a-select v-model="queryParam.status" placeholder="请选择" default-value="0">
-                  <a-select-option  v-for="(item, index) in CONTENT_STATUS" :key="index" :value="item.value">{{item.text}}</a-select-option>
+              <a-form-item label="创建时间">
+                <a-range-picker v-model:value="ctime" />
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
+              <a-form-item label="审核状态">
+                <a-select v-model="queryParam.status" placeholder="请选择" default-value="">
+                  <a-select-option value="">全部</a-select-option>
+                  <a-select-option  v-for="(item, index) in AUDIT_STATUS" :key="index" :value="item.value">{{item.text}}</a-select-option>
                 </a-select>
-              </a-form-item>
-            </a-col>
-            <a-col :md="8" :sm="24">
-              <a-form-item label="订单创建时间">
-                <a-range-picker v-model:value="queryParam.ctime" />
               </a-form-item>
             </a-col>
             <a-col :md="24" :sm="24" style="text-align: right">
@@ -72,7 +73,7 @@
   import moment from 'moment'
   import { STable } from '@/components'
 
-  import { CONTENT_STATUS } from '@/utils/dict'
+  import { AUDIT_STATUS, CONTENT_STATUS } from '@/utils/dict'
   import { auditContent, getContentInfo, getContentList } from '@/api/contentService'
   import { getTextByValue } from '@/utils/dictUtils'
   import CreateForm from '@/views/content/CreateForm'
@@ -140,19 +141,17 @@
     data () {
       this.columns = columns
       return {
-        CONTENT_STATUS: CONTENT_STATUS,
+        AUDIT_STATUS: AUDIT_STATUS,
         visible: false,
         confirmLoading: false,
         mdl: {},
-        // 高级搜索 展开/关闭
         advanced: false,
-        // 查询参数
+        ctime: '',
         queryParam: {
           queryText: '',
           status: '',
           ctimeStart: '',
           ctimeEnd: '',
-          ctime: '',
         },
         // 加载数据方法 必须为 Promise 对象
         loadData: parameter => {
@@ -223,7 +222,13 @@
           date: moment(new Date())
         }
       }
-    }
+    },
+    watch: {
+      ctime(val){
+        this.queryParam.ctimeStart = val[0].format('YYYY-MM-DD')
+        this.queryParam.ctimeEnd = val[1].format('YYYY-MM-DD')
+      }
+    },
   }
 </script>
 <style lang="less" scoped>

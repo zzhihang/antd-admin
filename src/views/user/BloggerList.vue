@@ -5,20 +5,22 @@
         <a-form layout="inline">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
-              <a-form-item label="用户ID、手机号">
-                <a-input v-model="queryParam.queryText" placeholder=""/>
+              <a-form-item label="用户信息">
+                <a-input v-model="queryParam.queryText" placeholder="请输入用户ID、昵称、手机号、微信号"/>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
-              <a-form-item label="支付状态">
-                <a-select v-model="queryParam.status" placeholder="请选择" default-value="0">
-                  <a-select-option  v-for="(item, index) in CONTENT_STATUS" :key="index" :value="item.value">{{item.text}}</a-select-option>
+              <a-form-item label="状态">
+                <a-select v-model="queryParam.status" placeholder="请选择" default-value="">
+                  <a-select-option v-for="(item, index) in ENABLE_STATUS" :key="index" :value="item.value">
+                    {{item.text}}
+                  </a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
-              <a-form-item label="订单创建时间">
-                <a-range-picker v-model:value="queryParam.ctime" />
+              <a-form-item label="注册时间">
+                <a-range-picker v-model:value="ctime"/>
               </a-form-item>
             </a-col>
             <a-col :md="24" :sm="24" style="text-align: right">
@@ -26,6 +28,16 @@
               <a-button style="margin-left: 8px" type="primary" @click="exportSelect">导出</a-button>
               <a-button style="margin-left: 8px" type="primary" @click="exportAll">全部导出</a-button>
               <a-button style="margin-left: 8px" type="primary" @click="handleAdd">创建用户</a-button>
+              <a-popover title="自定义显示列" trigger="click" v-model="popVisible">
+                <template #content>
+                  <a-checkbox-group v-model="columnsChecked"
+                                    :options="columnsOrigin.map(item => item.title)"></a-checkbox-group>
+                  <div style="margin-top: 10px;text-align: right">
+                    <a-button style="margin-left: 8px" size="small" type="primary" @click="createColumns">保存</a-button>
+                  </div>
+                </template>
+                <!--<a-button style="margin-left: 8px" type="primary">自定义表格</a-button>-->
+              </a-popover>
               <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
             </a-col>
           </a-row>
@@ -46,7 +58,8 @@
           {{ index + 1 }}
         </span>
         <span slot="disable" slot-scope="text, record, index">
-          <a-switch :checked="String(text) === '1'" checked-children="启用中" un-checked-children="禁用中" @change="onDisableChange(record)"/>
+          <a-switch :checked="String(text) === '1'" checked-children="启用中" un-checked-children="禁用中"
+                    @change="onDisableChange(record)"/>
         </span>
 
         <span slot="action" slot-scope="text, record">
@@ -72,7 +85,7 @@
 <script>
   import { STable } from '@/components'
   import { getRoleList } from '@/api/manage'
-  import { CONTENT_STATUS } from '@/utils/dict'
+  import {  ENABLE_STATUS } from '@/utils/dict'
   import { getBloggerList, userDisable, userEnable, userSave } from '@/api/userService'
   import CreateForm from './modules/CreateForm'
 
@@ -83,27 +96,27 @@
     },
     {
       title: '用户ID',
-      dataIndex: 'id',
+      dataIndex: 'id'
     },
     {
       title: '用户昵称',
-      dataIndex: 'nickname',
+      dataIndex: 'nickname'
     },
     {
       title: '手机号',
       dataIndex: 'phone',
-      customRender: (text) => text && (text.substr(0,3)+'****'+text.substr(7))
-    },{
+      customRender: (text) => text && (text.substr(0, 3) + '****' + text.substr(7))
+    }, {
       title: '微信号',
-      dataIndex: 'wxNumber',
+      dataIndex: 'wxNumber'
     },
     {
       title: '注册时间',
-      dataIndex: 'ctime',
-    },{
+      dataIndex: 'ctime'
+    }, {
       title: '余额（元）',
-      dataIndex: 'money',
-    },{
+      dataIndex: 'money'
+    }, {
       title: '禁用账户',
       dataIndex: 'status',
       scopedSlots: { customRender: 'disable' }
@@ -116,46 +129,30 @@
     }
   ]
 
-  const statusMap = {
-    0: {
-      status: 'default',
-      text: '关闭'
-    },
-    1: {
-      status: 'processing',
-      text: '运行中'
-    },
-    2: {
-      status: 'success',
-      text: '已上线'
-    },
-    3: {
-      status: 'error',
-      text: '异常'
-    }
-  }
-
   export default {
     name: 'TableList',
     components: {
       STable,
-      CreateForm,
+      CreateForm
     },
-    data () {
-      this.columns = columns
+    data() {
       return {
-        CONTENT_STATUS: CONTENT_STATUS,
+        ENABLE_STATUS: [{text: '全部', value: ''}].concat(ENABLE_STATUS),
         visible: false,
+        popVisible: false,
         confirmLoading: false,
         mdl: null,
         createUserId: '',
         createUserUrl: '',
+        columns,
+        columnsOrigin: JSON.parse(JSON.stringify(columns)),
+        columnsChecked: columns.map(item => item.title),
+        ctime: '',
         queryParam: {
           queryText: '',
           status: '',
           ctimeStart: '',
           ctimeEnd: '',
-          ctime: '',
         },
         loadData: parameter => {
           const requestParameters = Object.assign({}, parameter, this.queryParam)
@@ -168,19 +165,17 @@
         selectedRows: []
       }
     },
-    filters: {
-      statusFilter (type) {
-        return statusMap[type].text
-      },
-      statusTypeFilter (type) {
-        return statusMap[type].status
-      }
-    },
-    created () {
+    created() {
       getRoleList({ t: new Date() })
     },
+    watch: {
+      ctime(val){
+        this.queryParam.ctimeStart = val[0].format('YYYY-MM-DD')
+        this.queryParam.ctimeEnd = val[1].format('YYYY-MM-DD')
+      }
+    },
     computed: {
-      rowSelection () {
+      rowSelection() {
         return {
           selectedRowKeys: this.selectedRowKeys,
           onChange: this.onSelectChange
@@ -188,26 +183,26 @@
       }
     },
     methods: {
-      handleAdd () {
+      handleAdd() {
         this.mdl = null
         this.visible = true
       },
-      handleEdit (record) {
+      handleEdit(record) {
         this.visible = true
         this.mdl = { ...record }
       },
-      handleOk () {
-        if(this.createUserId){
-          this.visible = false;
-          this.createUserId = '';
-          this.createUserUrl = '';
-        }else{
+      handleOk() {
+        if (this.createUserId) {
+          this.visible = false
+          this.createUserId = ''
+          this.createUserUrl = ''
+        } else {
           const form = this.$refs.createModal.form
           this.confirmLoading = true
           form.validateFields(async (errors, values) => {
             if (!errors) {
-              const {data} = await userSave(values);
-              this.createUserId = data.id;
+              const { data } = await userSave(values)
+              this.createUserId = data.id
               this.createUserUrl = data.url
               this.confirmLoading = false
               // 重置表单数据
@@ -220,59 +215,72 @@
           })
         }
       },
-      handleCancel () {
+      handleCancel() {
         this.visible = false
         const form = this.$refs.createModal.form
         form.resetFields() // 清理表单数据（可不做）
       },
-      handleDetail ({id}) {
-        this.$router.push({name: 'BloggerListDetail', query: {
+      handleDetail({ id }) {
+        this.$router.push({
+          name: 'BloggerListDetail', query: {
             id
-        }})
-      },
-      async onDisableChange(record){
-          if(record.status === 1){
-            this.$confirm({
-              content: `你确定要禁用${record.id}吗？`,
-              onOk: async () => {
-                const result = await userDisable(record.id);
-                if(result.success){
-                  this.$message.info(`禁用成功`)
-                  await this.$refs.table.refresh()
-                }else{
-                  this.$message.error(result.msg)
-                }
-              }
-            })
-          }else{
-            const result = await userEnable(record.id);
-            if(result.success){
-              this.$message.info(`启用成功`)
-              await this.$refs.table.refresh()
-            }else{
-              this.$message.error(result.msg)
-            }
           }
+        })
       },
-      exportSelect(){
+      async onDisableChange(record) {
+        if (record.status === 1) {
+          this.$confirm({
+            content: `你确定要禁用${record.id}吗？`,
+            onOk: async () => {
+              const result = await userDisable(record.id)
+              if (result.success) {
+                this.$message.info(`禁用成功`)
+                await this.$refs.table.refresh()
+              } else {
+                this.$message.error(result.msg)
+              }
+            }
+          })
+        } else {
+          const result = await userEnable(record.id)
+          if (result.success) {
+            this.$message.info(`启用成功`)
+            await this.$refs.table.refresh()
+          } else {
+            this.$message.error(result.msg)
+          }
+        }
+      },
+      exportSelect() {
+        if(!this.selectedRows.length){
+          return this.$message.warn('请先选择要导出的数据')
+        }
+        const ids = this.selectedRows.map(item => item.id);
+        this.exportAll(ids);
+      },
+      exportAll(id) {
+        let url = 'http://admin.shouzimu.xyz/api/admin/user/tz/export';
+        if(id.push){
+          url = 'http://admin.shouzimu.xyz/api/admin/user/tz/export?id=' + id.join(',');
+        }
+        window.open(url, '_blank')
+      },
+      createUser() {
 
       },
-      exportAll(){
-          const url = '/admin/user/tz/export';
-
-      },
-      createUser(){
-
-      },
-      onSelectChange (selectedRowKeys, selectedRows) {
+      onSelectChange(selectedRowKeys, selectedRows) {
         this.selectedRowKeys = selectedRowKeys
         this.selectedRows = selectedRows
-      },
+      }
     }
   }
 </script>
 <style lang="less" scoped>
-  /deep/.ant-form-item-children{
+  /deep/ .ant-form-item-children {
     display: flex;
+  }
+
+  /deep/ .ant-checkbox-group-item {
+    display: block;
   }
 </style>
