@@ -106,18 +106,19 @@ export default {
 
       const validateFieldsKey = customActiveKey === 'tab1' ? ['uid', 'passwd'] : ['mobile', 'captcha']
 
-      validateFields(validateFieldsKey, { force: true }, (err, values) => {
+      validateFields(validateFieldsKey, { force: true }, async (err, values) => {
         if (!err) {
           const loginParams = { ...values }
           delete loginParams.uid
-          loginParams[!state.loginType ? 'email' : 'uid'] = values.uid
+          loginParams[!state.loginType ? 'uid' : 'uid'] = values.uid
           loginParams.passwd = md5(values.passwd)
-          Login(loginParams)
-            .then((res) => this.loginSuccess(res))
-            .catch(err => this.requestFailed(err))
-            .finally(() => {
-              state.loginBtn = false
-            })
+          const result = await Login(loginParams);
+          if(result.success){
+            this.loginSuccess(result)
+          }else{
+            this.requestFailed(result)
+          }
+          state.loginBtn = false
         } else {
           setTimeout(() => {
             state.loginBtn = false
@@ -139,7 +140,7 @@ export default {
       this.isLoginError = true
       this.$notification['error']({
         message: '错误',
-        description: ((err.response || {}).data || {}).message || '请求出现错误，请稍后再试',
+        description: err.msg || '请求出现错误，请稍后再试',
         duration: 4
       })
     }

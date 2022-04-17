@@ -56,6 +56,7 @@
         ref="table"
         size="default"
         rowKey="key"
+        :scroll="{x: 2500}"
         :columns="columns"
         :rowSelection="rowSelection"
         :data="loadData"
@@ -94,6 +95,7 @@
   import { BUSINESS_TYPE, SUBSCRIBE_STATUS, ENABLE_STATUS } from '@/utils/dict'
   import { getMemberList, userDisable, userEnable, userSave } from '@/api/userService'
   import CreateForm from './modules/CreateForm'
+  import { getTextByValue } from '@/utils/dictUtils'
 
   const columns = [
     {
@@ -126,7 +128,7 @@
         dataIndex: 'subscribeTime',
       }, {
         title: '订阅结束时间',
-        dataIndex: 'age',
+        dataIndex: 'subscribeTime',
       }, {
         title: '博主用户ID',
         dataIndex: 'tzId',
@@ -135,24 +137,28 @@
         dataIndex: 'tzNickname',
       }, {
         title: '专题名称',
-        dataIndex: 'age',
+        dataIndex: 'title',
       }, {
         title: '订阅类型',
         dataIndex: 'subscribeType',
+        customRender: (text) => getTextByValue(text, 'BUSINESS_TYPE')
       }, {
         title: '订阅状态',
         dataIndex: 'subscribeStatus',
+        customRender: (text) => getTextByValue(text, 'SUBSCRIBE_STATUS')
       }],
     },{
       title: '禁用账户',
       dataIndex: 'status',
       width: 150,
+      fixed: 'right',
       scopedSlots: { customRender: 'disable' }
     },
     {
       title: '操作',
       dataIndex: 'action',
       width: '150px',
+      fixed: 'right',
       scopedSlots: { customRender: 'action' }
     }
   ]
