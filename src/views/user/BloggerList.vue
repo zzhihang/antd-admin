@@ -28,16 +28,6 @@
               <a-button style="margin-left: 8px" type="primary" @click="exportSelect">导出</a-button>
               <a-button style="margin-left: 8px" type="primary" @click="exportAll">全部导出</a-button>
               <a-button style="margin-left: 8px" type="primary" @click="handleAdd">创建用户</a-button>
-              <a-popover title="自定义显示列" trigger="click" v-model="popVisible">
-                <template #content>
-                  <a-checkbox-group v-model="columnsChecked"
-                                    :options="columnsOrigin.map(item => item.title)"></a-checkbox-group>
-                  <div style="margin-top: 10px;text-align: right">
-                    <a-button style="margin-left: 8px" size="small" type="primary" @click="createColumns">保存</a-button>
-                  </div>
-                </template>
-                <!--<a-button style="margin-left: 8px" type="primary">自定义表格</a-button>-->
-              </a-popover>
               <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
             </a-col>
           </a-row>
@@ -84,7 +74,6 @@
 
 <script>
   import { STable } from '@/components'
-  import { getRoleList } from '@/api/manage'
   import {  ENABLE_STATUS } from '@/utils/dict'
   import { getBloggerList, userDisable, userEnable, userSave } from '@/api/userService'
   import CreateForm from './modules/CreateForm'
@@ -164,9 +153,6 @@
         selectedRowKeys: [],
         selectedRows: []
       }
-    },
-    created() {
-      getRoleList({ t: new Date() })
     },
     watch: {
       ctime(val){

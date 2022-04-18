@@ -5,7 +5,7 @@ export const CONTENT_STATUS = [{text: '待审核', value: '0'}, {text: '通过',
 export const AUDIT_STATUS = [{text: '待审核', value: '0'},{text: '审核通过', value: '1'}, {text: '审核不通过', value: '2'}];
 export const ENABLE_STATUS = [{text: '启用', value: 1}, {text: '禁用', value: 0}];
 export const SUBSCRIBE_STATUS = [{text: '订阅中', value: '1'}, {text: '已过期', value: '0'}];
-export const DYNAMIC_TYPE = [{text: '文本', value: 'text'}, {text: '图片', value: 'pic'}, {text: '文档', value: 'file'}, {text: '语音', value: 'voice'}];
+export const DYNAMIC_TYPE = [{text: '文本', value: 'text'}, {text: '图片', value: 'pic'}, {text: '文档', value: 'doc'}, {text: '语音', value: 'voice'}];
 export const ORDER_TYPE = [{text: '付费订阅', value: 'zhuanti'}];
 
 

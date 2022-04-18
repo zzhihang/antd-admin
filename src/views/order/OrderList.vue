@@ -133,7 +133,6 @@
 <script>
   import moment from 'moment'
   import { STable, Ellipsis } from '@/components'
-  import { getRoleList } from '@/api/manage'
 
   import OrderDetail from './modules/OrderDetail'
   import { getOrderList } from '@/api/orderService'
@@ -289,9 +288,6 @@
       statusTypeFilter (type) {
         return statusMap[type].status
       }
-    },
-    created () {
-      getRoleList({ t: new Date() })
     },
     computed: {
       rowSelection () {

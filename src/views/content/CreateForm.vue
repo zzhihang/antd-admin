@@ -1,7 +1,7 @@
 <template>
   <a-modal
     title="内容详情"
-    :width="740"
+    :width="850"
     :visible="visible"
     :confirmLoading="loading"
     @ok="() => { $emit('ok') }"
@@ -12,13 +12,29 @@
         <a-form-item label="用户ID">
           <span>{{model.userId}}</span>
         </a-form-item>
-        <a-form-item label="文本" >
-          <p>{{model.context}}</p>
+        <a-form-item label="文本">
+          <p>{{model.title}}</p>
         </a-form-item>
-        <a-form-item label="图片">
+        <a-form-item label="图片" v-if="type === 'pic'">
             <div class="pic-box">
-              <img v-for="(item, index) in 3" :key="index" src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png" alt="">
+              <img v-for="(item, index) in content" :key="index" :src="item.url" alt="">
             </div>
+        </a-form-item>
+        <a-form-item label="文档" v-if="type === 'doc'">
+          <div class="pic-box">
+            <a-card size="small" v-for="(item, index) in content" :key="index" style="width: 150px">
+              <template #title>
+                <a href="#"><a-icon :style="{fontSize: '20px'}"  :type="item.type.includes('pdf') ? 'file-pdf' : 'file-word'" /></a>
+              </template>
+              <template #extra><a :href="item.url" target="_blank">预览</a></template>
+              <p>{{item.name}}</p>
+            </a-card>
+          </div>
+        </a-form-item>
+        <a-form-item label="语音" v-if="type === 'voice'">
+          <div class="pic-box">
+            <my-audio :long="content[0].timeLong" :url="content[0].url"/>
+          </div>
         </a-form-item>
         <a-form-item label="审核">
           <a-radio-group v-if="!model.ifDetail" @change="onRadioChange" v-decorator="['auditType', {rules: [{required: true, message: '请选择'}]}]"  style="margin-top: 6px;">
@@ -41,11 +57,10 @@
 <script>
 import pick from 'lodash.pick'
 import ATextarea from 'ant-design-vue/es/input/TextArea'
-// 表单字段
+import MyAudio from '@/components/MyAudio/MyAudio'
 const fields = ['appId', 'appSecret', 'appSecret']
-
 export default {
-  components: { ATextarea },
+  components: { ATextarea, MyAudio},
   props: {
     visible: {
       type: Boolean,
@@ -73,13 +88,17 @@ export default {
     }
     return {
       form: this.$form.createForm(this),
+      content: {},
+      type: 'text'
     }
   },
   created () {
     fields.forEach(v => this.form.getFieldDecorator(v))
     // 当 model 发生改变时，为表单设置值
     this.$watch('model', () => {
-      this.model && this.form.setFieldsValue(pick(this.model, fields))
+      this.model && this.form.setFieldsValue(pick(this.model, fields));
+      this.type = this.model.type;
+      this.content = this.model.content;
     })
   },
   methods: {
@@ -91,10 +110,23 @@ export default {
 </script>
 <style lang="less" scoped>
   .pic-box{
+    display: flex;
+    flex-wrap: wrap;
     img{
       width: 100px;
       margin-right: 10px;
       margin-bottom: 10px;
     }
+    .ant-card{
+      margin-right: 10px;
+      margin-bottom: 10px;
+
+    }
+  }
+  /deep/.ant-form-item-label{
+    width: 15%;
+  }
+  /deep/.ant-form-item-control-wrapper{
+    width: 85%;
   }
 </style>

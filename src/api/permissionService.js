@@ -114,14 +114,6 @@ export function sysAllPermission (params) {
   })
 }
 
-export function sysUserPermission (params) {
-  return request({
-    url: '/sysrole/userpermission',
-    method: 'post',
-    data: params
-  })
-}
-
 /**
 * @Description: 这个返回角色和对应的权限
 * @Param:
@@ -147,6 +139,21 @@ export function sysRoleAndPermission (params) {
 export function sysRoleSave (params) {
   return request({
     url: '/sysrole/save',
+    method: 'post',
+    data: params
+  })
+}
+
+/**
+* @Description: 用户信息
+* @Param:
+* @return:
+* @Author: zzhihang@hotmail.com
+* @date: 2022/4/18 23:01
+*/
+export function queryUserInfo (params) {
+  return request({
+    url: '/sysuser/info',
     method: 'post',
     data: params
   })

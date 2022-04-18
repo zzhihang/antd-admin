@@ -13,7 +13,7 @@ export const asyncRouterMap = [
     name: 'index',
     component: BasicLayout,
     meta: { title: '主页' },
-    redirect: '/dashboard/workplace',
+    redirect: '/user/blogger',
     children: [
       // dashboard
      /* {
@@ -250,11 +250,11 @@ export const asyncRouterMap = [
         path: '/sys',
         name: 'sys',
         component: RouteView,
-        redirect: '/syslog/list',
+        redirect: '/sys/log',
         meta: { title: '操作日志', icon: 'warning', permission: ['sys'] },
         children: [
           {
-            path: '/syslog/list',
+            path: '/sys/log',
             name: 'SyslogList',
             component: () => import(/* webpackChunkName: "fail" */ '@/views/sys/LogList'),
             meta: { title: '操作日志', permission: ['sys'] }
@@ -490,21 +490,6 @@ export const constantRouterMap = [
         name: 'login',
         component: () => import(/* webpackChunkName: "user" */ '@/views/user/Login')
       },
-      {
-        path: 'register',
-        name: 'register',
-        component: () => import(/* webpackChunkName: "user" */ '@/views/user/Register')
-      },
-      {
-        path: 'register-result',
-        name: 'registerResult',
-        component: () => import(/* webpackChunkName: "user" */ '@/views/user/RegisterResult')
-      },
-      {
-        path: 'recover',
-        name: 'recover',
-        component: undefined
-      }
     ]
   },
 

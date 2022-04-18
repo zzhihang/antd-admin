@@ -91,7 +91,6 @@
 
 <script>
   import { STable } from '@/components'
-  import { getRoleList } from '@/api/manage'
   import { BUSINESS_TYPE, SUBSCRIBE_STATUS, ENABLE_STATUS } from '@/utils/dict'
   import { getMemberList, userDisable, userEnable, userSave } from '@/api/userService'
   import CreateForm from './modules/CreateForm'
@@ -128,7 +127,7 @@
         dataIndex: 'subscribeTime',
       }, {
         title: '订阅结束时间',
-        dataIndex: 'subscribeTime',
+        dataIndex: 'subscribeEndTime',
       }, {
         title: '博主用户ID',
         dataIndex: 'tzId',
@@ -229,9 +228,6 @@
       statusTypeFilter (type) {
         return statusMap[type].status
       }
-    },
-    created () {
-      getRoleList({ t: new Date() })
     },
     computed: {
       rowSelection () {
