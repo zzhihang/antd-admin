@@ -10,7 +10,7 @@
       </a-descriptions>
       <a-divider style="margin-bottom: 32px"/>
       <a-descriptions>
-        <a-descriptions-item label="禁用账户">
+        <a-descriptions-item label="禁用账户" v-allow="24">
           <a-switch :checked="String(data.status) === '1'" checked-children="启用中" un-checked-children="禁用中" @change="onDisableChange"/>
         </a-descriptions-item>
       </a-descriptions>

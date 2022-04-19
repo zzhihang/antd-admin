@@ -106,8 +106,8 @@ export default {
     })
   },
   created () {
-    //const routes = this.mainMenu.find(item => item.path === '/')
-    const routes = asyncRouterMap.find((item) => item.path === '/')
+    const routes = this.mainMenu.find(item => item.path === '/')
+    //const routes = asyncRouterMap.find((item) => item.path === '/')
     this.menus = (routes && routes.children) || []
     // 处理侧栏收起状态
     this.$watch('collapsed', () => {

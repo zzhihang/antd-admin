@@ -2,6 +2,7 @@ import storage from 'store'
 import { login, getInfo, logout } from '@/api/login'
 import { ACCESS_TOKEN } from '@/store/mutation-types'
 import { welcome } from '@/utils/util'
+import { queryUserInfo } from '../../api/permissionService'
 
 const user = {
   state: {
@@ -50,11 +51,12 @@ const user = {
     // 获取用户信息
     GetInfo ({ commit }) {
       return new Promise((resolve, reject) => {
-        getInfo().then(response => {
+        queryUserInfo().then(response => {
           const result = response.data
           commit('SET_INFO', result)
           commit('SET_NAME', { name: result.name, welcome: welcome() })
           commit('SET_AVATAR', result.avatar)
+          commit('SET_ROLES', result.permissions)
           // if (result.role && result.role.permissions.length > 0) {
           //   const role = result.role
           //   role.permissions = result.role.permissions

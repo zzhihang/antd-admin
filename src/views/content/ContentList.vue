@@ -18,12 +18,12 @@
               <a-form-item label="审核状态">
                 <a-select v-model="queryParam.status" placeholder="请选择" default-value="">
                   <a-select-option value="">全部</a-select-option>
-                  <a-select-option  v-for="(item, index) in AUDIT_STATUS" :key="index" :value="item.value">{{item.text}}</a-select-option>
+                  <a-select-option v-for="(item, index) in AUDIT_STATUS" :key="index" :value="item.value">{{item.text}}</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
             <a-col :md="24" :sm="24" style="text-align: right">
-                <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
+                <a-button type="primary" @click="$refs.table.refresh(true)" v-allow="31">查询</a-button>
                 <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
             </a-col>
           </a-row>
@@ -49,8 +49,8 @@
 
         <span slot="action" slot-scope="text, record">
           <template>
-            <a @click="handleEdit(record)" v-if="record.status == 0">审核</a>
-            <a @click="handleEdit(record, 'detail')" v-else>查看详情</a>
+            <a @click="handleEdit(record)" v-allow="33" v-if="record.status == 0">审核</a>
+            <a @click="handleEdit(record, 'detail')" v-allow="32" v-else>查看详情</a>
           </template>
         </span>
       </s-table>

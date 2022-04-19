@@ -18,8 +18,8 @@
           </a-col>
           <a-col :md="8" :sm="24">
             <span class="table-page-search-submitButtons">
-              <a-button type="primary" @click="onCreateClick">创建账号</a-button>
-              <a-button type="primary" style="margin-left: 16px">查询</a-button>
+              <a-button type="primary" @click="onCreateClick" v-allow="37">创建账号</a-button>
+              <a-button type="primary" style="margin-left: 16px" v-allow="38">查询</a-button>
               <a-button style="margin-left: 8px">重置</a-button>
             </span>
           </a-col>
@@ -34,10 +34,18 @@
       :columns="columns"
       :data="loadData"
     >
-      <a-switch slot="status" slot-scope="text, record, index" :checked="String(text) === '1'" checked-children="启用中" un-checked-children="禁用中" @change="onDisableChange(record)"/>
+      <span>
+        <a-switch slot="status"
+                  v-allow="39"
+                  slot-scope="text, record, index"
+                  :checked="String(text) === '1'"
+                  checked-children="启用中"
+                  un-checked-children="禁用中"
+                  @change="onDisableChange(record)"/>
+      </span>
       <span slot="createTime" slot-scope="text">{{ text | moment }}</span>
       <span slot="action" slot-scope="text, record">
-        <a @click="handleEdit(record)">编辑</a>
+        <a @click="handleEdit(record)" v-allow="39">编辑</a>
       </span>
     </s-table>
 

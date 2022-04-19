@@ -41,11 +41,10 @@
               </a-form-item>
             </a-col>
             <a-col :md="24" :sm="24" style="text-align: right">
-              <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
-              <a-button style="margin-left: 8px" type="primary" @click="exportSelect">导出</a-button>
-              <a-button style="margin-left: 8px" type="primary" @click="exportAll">全部导出</a-button>
-              <a-button style="margin-left: 8px" type="primary" @click="handleAdd">创建用户</a-button>
-              <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
+              <a-button type="primary" v-allow="20" @click="$refs.table.refresh(true)">查询</a-button>
+              <a-button style="margin-left: 8px" type="primary" v-allow="21" @click="exportSelect">导出</a-button>
+              <a-button style="margin-left: 8px" type="primary" v-allow="22" @click="exportAll">全部导出</a-button>
+              <a-button style="margin-left: 8px" @click="() => {this.queryParam = {};this.ctime='';this.subscribeTime=''}">重置</a-button>
             </a-col>
           </a-row>
         </a-form>
@@ -65,13 +64,13 @@
         <span slot="serial" slot-scope="text, record, index">
           {{ index + 1 }}
         </span>
-        <span slot="disable" slot-scope="text, record, index">
+        <span slot="disable" slot-scope="text, record, index" v-allow="24">
           <a-switch :checked="String(text) === '1'" checked-children="启用中" un-checked-children="禁用中" @change="onDisableChange(record)"/>
         </span>
 
         <span slot="action" slot-scope="text, record">
           <template>
-            <a @click="handleDetail(record)">查看详情</a>
+            <a @click="handleDetail(record)" v-allow="25">查看详情</a>
           </template>
         </span>
       </s-table>
@@ -104,6 +103,26 @@
     {
       title: '用户ID',
       dataIndex: 'id',
+      customRender: (text, row, index) => {
+        const obj = {
+          children: text,
+          props: {},
+        };
+
+        if (index === 2) {
+          obj.props.rowSpan = 2;
+        } // These two are merged into above cell
+
+        if (index === 3) {
+          obj.props.rowSpan = 0;
+        }
+
+        if (index === 4) {
+          obj.props.colSpan = 0;
+        }
+
+        return obj;
+      },
     },
     {
       title: '用户昵称',
@@ -161,25 +180,6 @@
       scopedSlots: { customRender: 'action' }
     }
   ]
-
-  const statusMap = {
-    0: {
-      status: 'default',
-      text: '关闭'
-    },
-    1: {
-      status: 'processing',
-      text: '运行中'
-    },
-    2: {
-      status: 'success',
-      text: '已上线'
-    },
-    3: {
-      status: 'error',
-      text: '异常'
-    }
-  }
 
   export default {
     name: 'TableList',
@@ -328,12 +328,16 @@
     },
     watch: {
       ctime(val){
-        this.queryParam.startTime = val[0].format('YYYY-MM-DD')
-        this.queryParam.endTime = val[1].format('YYYY-MM-DD')
+        if(val){
+          this.queryParam.startTime = val[0].format('YYYY-MM-DD')
+          this.queryParam.endTime = val[1].format('YYYY-MM-DD')
+        }
       },
       subscribeTime(val){
-        this.queryParam.subscribeStart = val[0].format('YYYY-MM-DD')
-        this.queryParam.subscribeEnd = val[1].format('YYYY-MM-DD')
+        if(val){
+          this.queryParam.subscribeStart = val[0].format('YYYY-MM-DD')
+          this.queryParam.subscribeEnd = val[1].format('YYYY-MM-DD')
+        }
       }
     },
   }

@@ -18,12 +18,12 @@
           <a-descriptions-item class="my-style" label="平台服务费">
             <div style="display: flex;">
               <a-input v-model="data.serviceRate" :disabled="true" addon-after="%"/>
-              <a-button type="primary" style="margin-left: 10px;" @click="onEditClick">更改</a-button>
+              <a-button type="primary" style="margin-left: 10px;" @click="onEditClick" v-allow="19">更改</a-button>
             </div>
           </a-descriptions-item>
         </a-descriptions>
       </div>
-      <a-descriptions>
+      <a-descriptions v-allow="17">
         <a-descriptions-item label="禁用账户">
           <a-switch :checked="String(data.status) === '1'" checked-children="启用中" un-checked-children="禁用中" @change="onDisableChange"/>
         </a-descriptions-item>

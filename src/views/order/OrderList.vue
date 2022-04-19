@@ -40,9 +40,9 @@
               </a-col>
               <a-col :md="8" :sm="24">
                 <a-form-item label="交易金额">
-                  <a-input v-model="queryParam.payPriceStart" placeholder=""/>
+                  <a-input v-model="queryParam.payPriceStart" placeholder="请输入金额"/>
                   <span>到</span>
-                  <a-input v-model="queryParam.payPriceEnd" placeholder=""/>
+                  <a-input v-model="queryParam.payPriceEnd" placeholder="请输入金额"/>
                 </a-form-item>
               </a-col>
               <a-col :md="8" :sm="24">
@@ -56,17 +56,17 @@
                 </a-form-item>
               </a-col>
               <a-col :md="8" :sm="24">
-                <a-form-item label="博主ID、昵称、手机号">
-                  <a-input v-model="queryParam.tzQuery" placeholder=""/>
+                <a-form-item label="博主信息">
+                  <a-input v-model="queryParam.tzQuery" placeholder="请输入博主ID、昵称、手机号"/>
                 </a-form-item>
               </a-col>
             </template>
             <a-col :md="!advanced && 8 || 24" :sm="24">
               <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
-                <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
-                <a-button style="margin-left: 8px" type="primary" @click="exportSelect">导出</a-button>
-              <a-button style="margin-left: 8px" type="primary" @click="exportAll">全部导出</a-button>
-                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
+                <a-button type="primary" @click="$refs.table.refresh(true)" v-allow="26">查询</a-button>
+                <a-button style="margin-left: 8px" type="primary" @click="exportSelect" v-allow="27">导出</a-button>
+              <a-button style="margin-left: 8px" type="primary" @click="exportAll" v-allow="28">全部导出</a-button>
+                <a-button style="margin-left: 8px" @click="() => {this.queryParam = {};this.ctime = '';this.payTime=''}">重置</a-button>
                 <a @click="toggleAdvanced" style="margin-left: 8px">
                   {{ advanced ? '收起' : '展开' }}
                   <a-icon :type="advanced ? 'up' : 'down'"/>
@@ -113,7 +113,7 @@
 
         <span slot="action" slot-scope="text, record">
           <template>
-            <a @click="handleDetail(record)">查看详情</a>
+            <a @click="handleDetail(record)" v-allow="30">查看详情</a>
           </template>
         </span>
       </s-table>
@@ -344,12 +344,16 @@
     },
     watch: {
       ctime(val){
-        this.queryParam.startTime = val[0].format('YYYY-MM-DD')
-        this.queryParam.endTime = val[1].format('YYYY-MM-DD')
+        if(val){
+          this.queryParam.startTime = val[0].format('YYYY-MM-DD')
+          this.queryParam.endTime = val[1].format('YYYY-MM-DD')
+        }
       },
       payTime(val){
-        this.queryParam.payStart = val[0].format('YYYY-MM-DD')
-        this.queryParam.payTimeEnd = val[1].format('YYYY-MM-DD')
+        if(val){
+          this.queryParam.payStart = val[0].format('YYYY-MM-DD')
+          this.queryParam.payTimeEnd = val[1].format('YYYY-MM-DD')
+        }
       }
     },
   }

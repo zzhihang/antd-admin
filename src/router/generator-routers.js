@@ -50,9 +50,26 @@ const constantRouterComponents = {
   SecuritySettings: () => import('@/views/account/settings/Security'),
   CustomSettings: () => import('@/views/account/settings/Custom'),
   BindingSettings: () => import('@/views/account/settings/Binding'),
-  NotificationSettings: () => import('@/views/account/settings/Notification')
+  NotificationSettings: () => import('@/views/account/settings/Notification'),
 
-  // 'TestWork': () => import(/* webpackChunkName: "TestWork" */ '@/views/dashboard/TestWork')
+  '/user': RouteView,
+  '/user/blogger': () => import('@/views/user/BloggerList'),
+  '/user/member': () => import('@/views/user/MemberList'),
+
+  '/order': RouteView,
+  '/order/list': () => import('@/views/order/OrderList'),
+
+  '/content': RouteView,
+  '/content/list': () => import('@/views/content/ContentList'),
+
+  '/sys': RouteView,
+  '/sys/log': () => import('@/views/sys/LogList'),
+
+  '/permission': RouteView,
+  '/permission/role': () => import('@/views/permission/RoleList'),
+  '/permission/user': () => import('@/views/permission/UserList'),
+  '/permission/dictionary': () => import('@/views/permission/dictionary/dictionary'),
+
 }
 
 // 前端未找到页面路由（固定不用改）
@@ -80,28 +97,18 @@ const rootRouter = {
  * @param token
  * @returns {Promise<Router>}
  */
-export const generatorDynamicRouter = token => {
+export const generatorDynamicRouter = roles => {
   return new Promise((resolve, reject) => {
-    loginService
-      .getCurrentUserNav(token)
-      .then(res => {
-        console.log('generatorDynamicRouter response:', res)
-        const { result } = res
-        const menuNav = []
-        const childrenNav = []
-        //      后端数据, 根级树数组,  根级 PID
-        listToTree(result, childrenNav, 0)
-        rootRouter.children = childrenNav
-        menuNav.push(rootRouter)
-        console.log('menuNav', menuNav)
-        const routers = generator(menuNav)
-        routers.push(notFoundRouter)
-        console.log('routers', routers)
-        resolve(routers)
-      })
-      .catch(err => {
-        reject(err)
-      })
+    const menuNav = []
+    const childrenNav = []
+    listToTree(roles, childrenNav, null)
+    rootRouter.children = childrenNav
+    menuNav.push(rootRouter)
+    console.log(menuNav)
+    const routers = generator(menuNav)
+    console.log(routers)
+    routers.push(notFoundRouter)
+    resolve(routers)
   })
 }
 
@@ -120,18 +127,15 @@ export const generator = (routerMap, parent) => {
       path: item.path || `${(parent && parent.path) || ''}/${item.key}`,
       // 路由名称，建议唯一
       name: item.name || item.key || '',
-      // 该路由对应页面的 组件 :方案1
-      // component: constantRouterComponents[item.component || item.key],
-      // 该路由对应页面的 组件 :方案2 (动态加载)
-      component: constantRouterComponents[item.component || item.key] || (() => import(`@/views/${item.component}`)),
+      component: constantRouterComponents[item.component || item.path || item.key] || (() => import(`@/views/${item.component}`)),
 
       // meta: 页面标题, 菜单图标, 页面权限(供指令权限用，可去掉)
       meta: {
-        title: title,
+        title: item.name,
         icon: icon || undefined,
         hiddenHeaderContent: hiddenHeaderContent,
         target: target,
-        permission: item.name
+        permission: item.children && item.children[0] && item.children[0].type === 'B' ? item.children : []
       }
     }
     // 是否设置了隐藏菜单
@@ -148,8 +152,8 @@ export const generator = (routerMap, parent) => {
     }
     // 重定向
     item.redirect && (currentRouter.redirect = item.redirect)
-    // 是否有子菜单，并递归处理
-    if (item.children && item.children.length > 0) {
+    // 是否有子菜单，并且子菜单类型为菜单不为按钮 并递归处理
+    if (item.children && item.children[0] && item.children[0].type === 'M' && item.children.length > 0) {
       // Recursion
       currentRouter.children = generator(item.children, currentRouter)
     }
@@ -166,7 +170,7 @@ export const generator = (routerMap, parent) => {
 const listToTree = (list, tree, parentId) => {
   list.forEach(item => {
     // 判断是否为父级菜单
-    if (item.parentId === parentId) {
+    if (item.pid === parentId) {
       const child = {
         ...item,
         key: item.key || item.name,

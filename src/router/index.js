@@ -11,8 +11,6 @@ Router.prototype.push = function push (location, onResolve, onReject) {
 
 Vue.use(Router)
 
-console.log(constantRouterMap, asyncRouterMap)
-
 export default new Router({
   mode: 'history',
   routes: constantRouterMap.concat(asyncRouterMap)

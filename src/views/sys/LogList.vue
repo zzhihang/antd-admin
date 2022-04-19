@@ -23,7 +23,7 @@
               </a-form-item>
             </a-col>
             <a-col :md="24" :sm="24" style="text-align: right">
-              <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
+              <a-button type="primary" @click="$refs.table.refresh(true)" v-allow="34">查询</a-button>
               <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
             </a-col>
           </a-row>

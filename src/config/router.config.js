@@ -180,33 +180,33 @@ export const asyncRouterMap = [
         name: 'user',
         component: RouteView,
         redirect: '/user/blogger',
-        meta: { title: '用户管理', icon: 'warning', permission: ['user'] },
+        meta: { title: '用户管理', icon: 'warning'},
         children: [
           {
             path: '/user/blogger',
             name: 'BloggerList',
             component: () => import(/* webpackChunkName: "fail" */ '@/views/user/BloggerList'),
-            meta: { title: '博主管理', permission: ['user'] },
+            meta: { title: '博主管理'},
           },
           {
             path: '/user/blogger/detail',
             name: 'BloggerListDetail',
             component: () => import(/* webpackChunkName: "fail" */ '@/views/user/BloggerDetail'),
             hidden: true,
-            meta: { title: '查看详情', permission: ['user'] }
+            meta: { title: '查看详情'}
           },
           {
             path: '/user/member',
             name: 'MemberList',
             component: () => import(/* webpackChunkName: "fail" */ '@/views/user/MemberList'),
-            meta: { title: '会员管理', permission: ['user'] }
+            meta: { title: '会员管理'}
           },
           {
             path: '/user/member/detail',
             name: 'MemberDetail',
             hidden: true,
             component: () => import(/* webpackChunkName: "fail" */ '@/views/user/MemberDetail'),
-            meta: { title: '查看详情', permission: ['user'] }
+            meta: { title: '查看详情'}
           },
         ]
       },
@@ -217,13 +217,13 @@ export const asyncRouterMap = [
         name: 'order',
         component: RouteView,
         redirect: '/order/list',
-        meta: { title: '订单管理', icon: 'warning', permission: ['order'] },
+        meta: { title: '订单管理', icon: 'warning'},
         children: [
           {
             path: '/order/list',
             name: 'OrderList',
             component: () => import(/* webpackChunkName: "fail" */ '@/views/order/OrderList'),
-            meta: { title: '订单管理', permission: ['order'] }
+            meta: { title: '订单管理'}
           }
         ]
       },
@@ -234,13 +234,13 @@ export const asyncRouterMap = [
         name: 'content',
         component: RouteView,
         redirect: '/content/list',
-        meta: { title: '运营管理', icon: 'warning', permission: ['content'] },
+        meta: { title: '运营管理', icon: 'warning'},
         children: [
           {
             path: '/content/list',
             name: 'ContentList',
             component: () => import(/* webpackChunkName: "fail" */ '@/views/content/ContentList'),
-            meta: { title: '内容管理', permission: ['content'] }
+            meta: { title: '内容管理'}
           }
         ]
       },
@@ -251,13 +251,13 @@ export const asyncRouterMap = [
         name: 'sys',
         component: RouteView,
         redirect: '/sys/log',
-        meta: { title: '操作日志', icon: 'warning', permission: ['sys'] },
+        meta: { title: '操作日志', icon: 'warning'},
         children: [
           {
             path: '/sys/log',
             name: 'SyslogList',
             component: () => import(/* webpackChunkName: "fail" */ '@/views/sys/LogList'),
-            meta: { title: '操作日志', permission: ['sys'] }
+            meta: { title: '操作日志' }
           }
         ]
       },
@@ -268,7 +268,7 @@ export const asyncRouterMap = [
         name: 'permission',
         component: RouteView,
         redirect: '/permission/user',
-        meta: { title: '权限管理', icon: 'warning', permission: ['permission'] },
+        meta: { title: '权限管理', icon: 'warning' },
         children: [
           {
             path: '/permission/role',

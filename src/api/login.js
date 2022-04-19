@@ -8,9 +8,7 @@ const userApi = {
   twoStepCode: '/auth/2step-code',
   SendSms: '/account/sms',
   SendSmsErr: '/account/sms_err',
-  // get my info
   UserInfo: '/sysmenu/get',
-  UserMenu: '/user/nav'
 }
 
 /**
@@ -50,12 +48,6 @@ export function getInfo () {
   })
 }
 
-export function getCurrentUserNav () {
-  return request({
-    url: userApi.UserMenu,
-    method: 'get'
-  })
-}
 
 export function logout () {
   return request({

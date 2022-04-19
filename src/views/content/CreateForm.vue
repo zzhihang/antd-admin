@@ -43,11 +43,9 @@
           </a-radio-group>
           <span v-else>{{model.status | useDictAUDIT_STATUS}}</span>
         </a-form-item>
-        <a-form-item label="备注" v-if="!model.ifDetail">
-          <a-textarea v-if="showRemark" placeholder="请备注审核不通过原因（可选填）" v-decorator="['audit']" />
-        </a-form-item>
-        <a-form-item label="备注" v-else>
-          <p>{{model.failInfo}}</p>
+        <a-form-item label="备注" v-if="showRemark">
+          <a-textarea v-if="!model.ifDetail" placeholder="请备注审核不通过原因（可选填）" v-decorator="['audit']" />
+          <p v-else>{{model.failInfo}}</p>
         </a-form-item>
       </a-form>
     </a-spin>
