@@ -70,7 +70,7 @@ export function userSave (data) {
 
 export function userSaveServiceRate (data) {
   return request({
-    url: '/admin/user/tz/save',
+    url: '/admin/user/tz/updateServiceRate',
     method: 'post',
     data: data
   })

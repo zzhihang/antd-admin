@@ -42,7 +42,7 @@
 
 <script>
   import Vue from 'vue'
-  import { userDisable, userEnable, userQuery } from '@/api/userService'
+  import { userDisable, userEnable, userQuery, userSaveServiceRate } from '@/api/userService'
   import EditServiceRate from '@/views/user/modules/EditServiceRate'
 
   export default {
@@ -97,12 +97,17 @@
         this.confirmLoading = true
         form.validateFields(async (errors, values) => {
           if (!errors) {
-            const {data} = await userSaveServiceRate(values);
-            this.visible = false
-            this.confirmLoading = false
-            form.resetFields()
-            this.$refs.table.refresh()
-            this.$message.info('修改成功')
+            values.id = this.data.id;
+            const result = await userSaveServiceRate(values);
+            if(result.success){
+              this.$message.info('修改成功')
+              this.visible = false
+              this.confirmLoading = false
+              form.resetFields()
+              await this.getUserInfo();
+            }else{
+              this.$message.error(result.msg);
+            }
           } else {
             this.confirmLoading = false
           }

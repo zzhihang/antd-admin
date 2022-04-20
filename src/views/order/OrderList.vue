@@ -56,8 +56,8 @@
                 </a-form-item>
               </a-col>
               <a-col :md="8" :sm="24">
-                <a-form-item label="博主信息">
-                  <a-input v-model="queryParam.tzQuery" placeholder="请输入博主ID、昵称、手机号"/>
+                <a-form-item label="糖主信息">
+                  <a-input v-model="queryParam.tzQuery" placeholder="请输入糖主ID、昵称、手机号"/>
                 </a-form-item>
               </a-col>
             </template>
@@ -175,10 +175,10 @@
       title: '订单交易时间',
       dataIndex: 'payTime',
     },{
-      title: '博主ID',
+      title: '糖主ID',
       dataIndex: 'tzUserId',
     },{
-      title: '博主昵称',
+      title: '糖主昵称',
       dataIndex: 'tzNickname',
     },{
       title: '专题名称',

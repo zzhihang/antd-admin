@@ -14,20 +14,20 @@
     -->
     <template v-slot:menuHeaderRender>
       <div>
-        <logo-svg />
+        <img :src="require('../../src/assets/logo.png')" alt="">
         <h1>{{ title }}</h1>
       </div>
     </template>
     <!-- 1.0.0+ 版本 pro-layout 提供 API,
           增加 Header 左侧内容区自定义
     -->
-    <template v-slot:headerContentRender>
-      <div>
-        <a-tooltip title="刷新页面">
-          <a-icon type="reload" style="font-size: 18px;cursor: pointer;" @click="() => { $message.info('只是一个DEMO') }" />
-        </a-tooltip>
-      </div>
-    </template>
+    <!--<template v-slot:headerContentRender>-->
+      <!--<div>-->
+        <!--<a-tooltip title="刷新页面">-->
+          <!--<a-icon type="reload" style="font-size: 18px;cursor: pointer;" @click="() => { $message.info('只是一个DEMO') }" />-->
+        <!--</a-tooltip>-->
+      <!--</div>-->
+    <!--</template>-->
 
     <setting-drawer v-if="isDev" :settings="settings" @change="handleSettingChange">
       <div style="margin: 12px 0;">
@@ -54,7 +54,6 @@ import { asyncRouterMap } from '@/config/router.config.js'
 import defaultSettings from '@/config/defaultSettings'
 import RightContent from '@/components/GlobalHeader/RightContent'
 import GlobalFooter from '@/components/GlobalFooter'
-import LogoSvg from '../assets/logo.svg?inline'
 
 export default {
   name: 'BasicLayout',
@@ -62,7 +61,6 @@ export default {
     SettingDrawer,
     RightContent,
     GlobalFooter,
-    LogoSvg,
   },
   data () {
     return {

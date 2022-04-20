@@ -9,7 +9,7 @@
         <div class="top">
           <div class="header">
             <a href="/">
-              <img src="~@/assets/logo.svg" class="logo" alt="logo">
+              <img :src="require('../../src/assets/logo.png')" class="logo" alt="logo">
               <span class="title">知识付费后台管理</span>
             </a>
           </div>
@@ -22,9 +22,9 @@
 
         <div class="footer">
           <div class="links">
-            <a href="_self">帮助</a>
-            <a href="_self">隐私</a>
-            <a href="_self">条款</a>
+            <!--<a href="_self">帮助</a>-->
+            <!--<a href="_self">隐私</a>-->
+            <!--<a href="_self">条款</a>-->
           </div>
           <div class="copyright">
             Copyright &copy; 2022
@@ -38,7 +38,7 @@
 <script>
 import { deviceMixin } from '@/store/device-mixin'
 import SelectLang from '@/components/SelectLang'
-
+import LogoSvg from '../assets/logo.png?inline'
 export default {
   name: 'UserLayout',
   components: {

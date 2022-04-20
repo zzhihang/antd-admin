@@ -38,8 +38,6 @@ const user = {
     Login ({ commit }, userInfo) {
       return new Promise((resolve, reject) => {
         login(userInfo).then(response => {
-          const {data} = response
-          // storage.set(ACCESS_TOKEN, data.admin_token, 7 * 24 * 60 * 60 * 1000)
           // commit('SET_TOKEN', data.admin_token)
           resolve(response)
         }).catch(error => {
@@ -86,16 +84,20 @@ const user = {
     // 登出
     Logout ({ commit, state }) {
       return new Promise((resolve) => {
-        logout(state.token).then(() => {
-          commit('SET_TOKEN', '')
-          commit('SET_ROLES', [])
-          storage.remove(ACCESS_TOKEN)
-          resolve()
-        }).catch((err) => {
-          console.log('logout fail:', err)
-          // resolve()
-        }).finally(() => {
-        })
+        commit('SET_TOKEN', '')
+        commit('SET_ROLES', [])
+        resolve()
+        storage.remove(ACCESS_TOKEN)
+        // logout(state.token).then(() => {
+        //   commit('SET_TOKEN', '')
+        //   commit('SET_ROLES', [])
+        //   storage.remove(ACCESS_TOKEN)
+        //   resolve()
+        // }).catch((err) => {
+        //   console.log('logout fail:', err)
+        //   // resolve()
+        // }).finally(() => {
+        // })
       })
     }
 

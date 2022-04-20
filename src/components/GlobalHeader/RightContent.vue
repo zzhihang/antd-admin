@@ -1,7 +1,7 @@
 <template>
   <div :class="wrpCls">
     <avatar-dropdown :menu="showMenu" :current-user="currentUser" :class="prefixCls" />
-    <select-lang :class="prefixCls" />
+    <!--<select-lang :class="prefixCls" />-->
   </div>
 </template>
 
@@ -45,14 +45,18 @@ export default {
         'ant-pro-global-header-index-right': true,
         [`ant-pro-global-header-index-${(this.isMobile || !this.topMenu) ? 'light' : this.theme}`]: true
       }
+    },
+    userInfo () {
+      return this.$store.getters.userInfo
     }
   },
   mounted () {
     setTimeout(() => {
       this.currentUser = {
-        name: '还没有做这里'
+        name: this.userInfo.name,
+        avatar: this.userInfo.avatar
       }
-    }, 1500)
+    }, 500)
   }
 }
 </script>

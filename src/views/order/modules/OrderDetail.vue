@@ -18,8 +18,8 @@
         <a-descriptions-item label="昵称">{{model.nickname}}</a-descriptions-item>
         <a-descriptions-item label="订单创建时间">{{model.ctime}}</a-descriptions-item>
         <a-descriptions-item label="订单交易时间">{{model.payTime}}</a-descriptions-item>
-        <a-descriptions-item label="博主ID">{{model.tzUserId}}</a-descriptions-item>
-        <a-descriptions-item label="博主昵称">{{model.tzNickname}}</a-descriptions-item>
+        <a-descriptions-item label="糖主ID">{{model.tzUserId}}</a-descriptions-item>
+        <a-descriptions-item label="糖主昵称">{{model.tzNickname}}</a-descriptions-item>
         <a-descriptions-item label="专题名称">{{model.businessTitle}}</a-descriptions-item>
         <a-descriptions-item label="订阅类型">{{model.businessType | useDictBUSINESS_TYPE}}</a-descriptions-item>
         <a-descriptions-item label="交易类型">{{model.orderType | useDictORDER_TYPE}}</a-descriptions-item>

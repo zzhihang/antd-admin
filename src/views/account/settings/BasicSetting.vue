@@ -5,25 +5,22 @@
 
         <a-form layout="vertical">
           <a-form-item
-            :label="$t('account.settings.basic.nickname')"
+            label="账号名称"
+            :required="true"
           >
-            <a-input :placeholder="$t('account.settings.basic.nickname-message')" />
-          </a-form-item>
-          <a-form-item
-            :label="$t('account.settings.basic.profile')"
-          >
-            <a-textarea rows="4" :placeholder="$t('account.settings.basic.profile-message')"/>
+            <a-input v-model="name" placeholder="请输入" />
           </a-form-item>
 
           <a-form-item
-            :label="$t('account.settings.basic.email')"
-            :required="false"
+            label="后台管理账号密码"
+            :required="true"
+            help="密码已通过MD5加密"
           >
-            <a-input placeholder="example@ant.design"/>
+            <a-input-password v-model="passwd" placeholder="请输入"/>
           </a-form-item>
 
           <a-form-item>
-            <a-button type="primary">{{ $t('account.settings.basic.update') }}</a-button>
+            <a-button type="primary" @click="onSaveClick">保存</a-button>
           </a-form-item>
         </a-form>
 
@@ -46,10 +43,12 @@
 </template>
 
 <script>
-import AvatarModal from './AvatarModal'
-import { baseMixin } from '@/store/app-mixin'
+  import AvatarModal from './AvatarModal'
+  import { baseMixin } from '@/store/app-mixin'
+  import md5 from 'md5'
+  import { saveLognUserInfo } from '@/api/permissionService'
 
-export default {
+  export default {
   mixins: [baseMixin],
   components: {
     AvatarModal
@@ -59,7 +58,7 @@ export default {
       // cropper
       preview: {},
       option: {
-        img: '/avatar2.jpg',
+        img: this.$store.getters.userInfo.avatar,
         info: true,
         size: 1,
         outputType: 'jpeg',
@@ -72,12 +71,32 @@ export default {
         // 开启宽度和高度比例
         fixed: true,
         fixedNumber: [1, 1]
-      }
+      },
+      passwd: '',
+      name: ''
     }
+  },
+  created(){
+    this.name = this.$store.getters.userInfo.name;
+    this.passwd = this.$store.getters.userInfo.passwd
   },
   methods: {
     setavatar (url) {
       this.option.img = url
+    },
+    async onSaveClick(){
+      const params = {
+        name: this.name,
+        passwd: md5(this.passwd),
+        avatar: this.option.img,
+        id: this.$store.getters.userInfo.id
+      }
+      const result = await saveLognUserInfo(params);
+      if(result.success){
+        this.$message.success('保存成功')
+      }else{
+        this.$message.error(result.msg);
+      }
     }
   }
 }

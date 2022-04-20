@@ -43,9 +43,9 @@
         </a-tab-pane>
       </a-tabs>
 
-      <a-form-item>
-        <a-checkbox v-decorator="['rememberMe', { valuePropName: 'checked' }]">自动登录</a-checkbox>
-      </a-form-item>
+      <!--<a-form-item>-->
+        <!--<a-checkbox v-decorator="['rememberMe', { valuePropName: 'checked' }]">自动登录</a-checkbox>-->
+      <!--</a-form-item>-->
 
       <a-form-item style="margin-top:24px">
         <a-button
@@ -65,6 +65,8 @@
 import md5 from 'md5'
 import { mapActions } from 'vuex'
 import { timeFix } from '@/utils/util'
+import { ACCESS_TOKEN } from '@/store/mutation-types'
+import storage from 'store'
 
 export default {
   data () {
@@ -114,6 +116,8 @@ export default {
           loginParams.passwd = md5(values.passwd)
           const result = await Login(loginParams);
           if(result.success){
+            const {data} = result
+            storage.set(ACCESS_TOKEN, data.admin_token, 7 * 24 * 60 * 60 * 1000)
             this.loginSuccess(result)
           }else{
             this.requestFailed(result)
@@ -127,7 +131,7 @@ export default {
       })
     },
     loginSuccess (res) {
-      this.$router.push({ path: '/user/blogger' })
+      this.$router.push({ path: '/' })
       setTimeout(() => {
         this.$notification.success({
           message: '欢迎',

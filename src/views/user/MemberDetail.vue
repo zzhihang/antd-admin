@@ -20,8 +20,8 @@
         <a-form layout="inline">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
-              <a-form-item label="博主ID、昵称">
-                <a-input v-model="queryParam.queryText" placeholder="请输入博主ID、昵称"/>
+              <a-form-item label="糖主ID、昵称">
+                <a-input v-model="queryParam.queryText" placeholder="请输入糖主ID、昵称"/>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
@@ -31,14 +31,16 @@
             </a-col>
             <a-col :md="8" :sm="24">
               <a-form-item label="订阅类型">
-                <a-select v-model="queryParam.subscribeType" placeholder="请选择" default-value="0">
+                <a-select v-model="queryParam.subscribeType" placeholder="请选择">
+                  <a-select-option value="">全部</a-select-option>
                   <a-select-option  v-for="(item, index) in BUSINESS_TYPE" :key="index" :value="item.value">{{item.text}}</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
               <a-form-item label="订阅状态">
-                <a-select v-model="queryParam.subscribeStatus" placeholder="请选择" default-value="0">
+                <a-select v-model="queryParam.subscribeStatus" placeholder="请选择">
+                  <a-select-option value="">全部</a-select-option>
                   <a-select-option  v-for="(item, index) in SUBSCRIBE_STATUS" :key="index" :value="item.value">{{item.text}}</a-select-option>
                 </a-select>
               </a-form-item>
@@ -52,8 +54,9 @@
       <a-table
         style="margin-top: 10px"
         row-key="id"
+        :pagination="false"
         :columns="goodsColumns"
-        :data-souce="tableData">
+        :data-source="tableData">
       </a-table>
     </a-card>
   </page-header-wrapper>
@@ -63,6 +66,7 @@
   import { getMemberInfo, userDisable, userEnable } from '@/api/userService'
   import { STable } from '@/components'
   import { BUSINESS_TYPE, SUBSCRIBE_STATUS } from '@/utils/dict'
+  import { getTextByValue } from '@/utils/dictUtils'
 
   export default {
     components: {
@@ -86,38 +90,41 @@
         goodsColumns: [
           {
             title: '订阅开始时间',
-            dataIndex: 'id',
+            dataIndex: 'subscribeTime',
             key: 'id'
           },
           {
             title: '订阅结束时间',
-            dataIndex: 'name',
+            dataIndex: 'expireTime',
             key: 'name'
           },
           {
-            title: '博主用户ID',
-            dataIndex: 'barcode',
+            title: '糖主用户ID',
+            dataIndex: 'tzId',
             key: 'barcode'
           },
           {
-            title: '博主昵称',
-            dataIndex: 'price',
+            title: '糖主昵称',
+            dataIndex: 'tzNickname',
             key: 'price',
           },
           {
             title: '专题名称',
-            dataIndex: 'num',
+            dataIndex: 'title',
+            width: '300px',
             key: 'num',
           },
           {
             title: '订阅类型',
-            dataIndex: 'amount',
-            key: 'amount',
+            dataIndex: 'subscribeType',
+            key: 'subscribeType',
+            customRender: (text) => getTextByValue(text, 'BUSINESS_TYPE')
           },
           {
             title: '订阅状态',
-            dataIndex: 'amount',
-            key: 'amount',
+            dataIndex: 'subscribeStatus',
+            key: 'subscribeStatus',
+            customRender: (text) => getTextByValue(text, 'SUBSCRIBE_STATUS')
           }
         ],
       }

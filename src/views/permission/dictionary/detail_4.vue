@@ -141,7 +141,7 @@
             scopedSlots: { customRender: 'operation' }
           }
         ],
-        checkList: ['博主管理', '会员管理', '订单管理'],
+        checkList: ['糖主管理', '会员管理', '订单管理'],
         data: []
       }
     },

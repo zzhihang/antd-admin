@@ -148,10 +148,10 @@
         title: '订阅结束时间',
         dataIndex: 'subscribeEndTime',
       }, {
-        title: '博主用户ID',
+        title: '糖主用户ID',
         dataIndex: 'tzId',
       }, {
-        title: '博主昵称',
+        title: '糖主昵称',
         dataIndex: 'tzNickname',
       }, {
         title: '专题名称',
