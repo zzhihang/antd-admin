@@ -285,7 +285,7 @@ export const asyncRouterMap = [
           {
             path: '/permission/dictionary',
             name: 'dictionary',
-            component: () => import('@/views/permission/dictionary/dictionary'),
+            component: () => import('@/views/permission/dictionary'),
             meta: { title: '字典管理', keepAlive: true }
           },{
             path: '/permission/detail_1236',
@@ -344,7 +344,7 @@ export const asyncRouterMap = [
         component: RouteView,
         redirect: '/account/center',
         name: 'account',
-        meta: { title: 'menu.account', icon: 'user', keepAlive: true, permission: ['user'] },
+        meta: { title: 'menu.account', icon: 'user', keepAlive: true },
         children: [
           // {
           //   path: '/account/center',
@@ -356,7 +356,7 @@ export const asyncRouterMap = [
             path: '/account/settings',
             name: 'settings',
             component: () => import('@/views/account/settings/Index'),
-            meta: { title: 'menu.account.settings', hideHeader: true, permission: ['user'] },
+            meta: { title: 'menu.account.settings', hideHeader: true },
             redirect: '/account/settings/basic',
             hideChildrenInMenu: true,
             children: [
@@ -364,7 +364,7 @@ export const asyncRouterMap = [
                 path: '/account/settings/basic',
                 name: 'BasicSettings',
                 component: () => import('@/views/account/settings/BasicSetting'),
-                meta: { title: '基本设置', hidden: true, permission: ['user'] }
+                meta: { title: '基本设置', hidden: true }
               },
               // {
               //   path: '/account/settings/security',
@@ -480,13 +480,13 @@ export const asyncRouterMap = [
  */
 export const constantRouterMap = [
   {
-    path: '/user',
+    path: '/login',
     component: UserLayout,
-    redirect: '/user/login',
+    redirect: '/login',
     hidden: true,
     children: [
       {
-        path: 'login',
+        path: '/login',
         name: 'login',
         component: () => import(/* webpackChunkName: "user" */ '@/views/user/Login')
       },

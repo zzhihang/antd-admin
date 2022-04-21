@@ -12,7 +12,7 @@ import Vue from 'vue';
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
 const allowList = ['login', 'register', 'registerResult'] // no redirect allowList
-const loginRoutePath = '/user/login'
+const loginRoutePath = '/login'
 const defaultRoutePath = '/user/blogger'
 
 //按扭权限指令

@@ -247,7 +247,7 @@
       exportAll(id) {
         let url = 'http://admin.shouzimu.xyz/api/admin/user/tz/export';
         if(id.push){
-          url = 'http://admin.shouzimu.xyz/api/admin/user/tz/export?id=' + id.join(',');
+          url = 'http://admin.shouzimu.xyz/api/admin/user/tz/export?ids=' + id.join(',');
         }
         window.open(url, '_blank')
       },

@@ -66,22 +66,22 @@
     },
     {
       title: '用户昵称',
-      dataIndex: 'tzNickname',
+      dataIndex: 'nickname',
     },
     {
       title: '手机号',
-      dataIndex: 'userPhone',
+      dataIndex: 'phone',
       customRender: (text) => text && (text.substr(0,3)+'****'+text.substr(7))
     },
     {
       title: '角色',
-      dataIndex: 'payTime',
+      dataIndex: 'roleName',
     },{
       title: '日志时间',
       dataIndex: 'ctime',
     },{
       title: '操作记录',
-      dataIndex: 'tzUserId',
+      dataIndex: 'logText',
     }
   ]
 

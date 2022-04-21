@@ -1,58 +1,60 @@
 <template>
-  <a-card :bordered="false">
-    <div class="table-page-search-wrapper">
-      <a-form layout="inline">
-        <a-row :gutter="48">
-          <!--<a-col :md="8" :sm="24">-->
+  <page-header-wrapper>
+    <a-card :bordered="false">
+      <div class="table-page-search-wrapper">
+        <a-form layout="inline">
+          <a-row :gutter="48">
+            <!--<a-col :md="8" :sm="24">-->
             <!--<a-form-item label="角色名称">-->
-              <!--<a-input placeholder="请输入"/>-->
+            <!--<a-input placeholder="请输入"/>-->
             <!--</a-form-item>-->
-          <!--</a-col>-->
-          <a-col :md="8" :sm="24">
+            <!--</a-col>-->
+            <a-col :md="8" :sm="24">
             <span class="table-page-search-submitButtons">
               <a-button type="primary" @click="onCreate" v-allow="35">创建角色</a-button>
             </span>
-          </a-col>
-        </a-row>
-      </a-form>
-    </div>
+            </a-col>
+          </a-row>
+        </a-form>
+      </div>
 
-    <div style="display: flex">
-      <s-table
-        ref="table"
-        size="default"
-        :columns="columns"
-        :data="sysRoleAndPermission"
-        style="flex: 1;margin-right: 14px;"
-      >
-        <!--:row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange, type: 'radio' }"-->
-        <span slot="action" slot-scope="text, record">
+      <div style="display: flex">
+        <s-table
+          ref="table"
+          size="default"
+          :columns="columns"
+          :data="sysRoleAndPermission"
+          style="flex: 1;margin-right: 14px;"
+        >
+          <!--:row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange, type: 'radio' }"-->
+          <span slot="action" slot-scope="text, record">
           <a @click="onRowEditClick(record)" v-allow="36">编辑</a>
         </span>
-        <span slot="serial" slot-scope="text, record, index">
+          <span slot="serial" slot-scope="text, record, index">
           {{ index + 1 }}
         </span>
-      </s-table>
+        </s-table>
 
-      <a-card title="权限分配" style="width: 450px" :headStyle="{fontWeight: 'bold'}">
-        <template #extra>
-          <a-button type="primary" @click="onRoleTreeSave" :disabled="selectedRows.length === 0">保存</a-button>
-        </template>
-        <a-tree
-          checkable
-          :defaultExpandAll="true"
-          :tree-data="treeData"
-          :replaceFields="{title:'name', key:'id' }"
-          v-model="checkedKeys"
-        >
-          <template #title0010><span style="color: #1890ff">sss</span></template>
-        </a-tree>
-      </a-card>
-    </div>
+        <a-card title="权限分配" style="width: 450px" :headStyle="{fontWeight: 'bold'}">
+          <template #extra>
+            <a-button type="primary" @click="onRoleTreeSave" :disabled="selectedRows.length === 0">保存</a-button>
+          </template>
+          <a-tree
+            checkable
+            :defaultExpandAll="true"
+            :tree-data="treeData"
+            :replaceFields="{title:'name', key:'id' }"
+            v-model="checkedKeys"
+          >
+            <template #title0010><span style="color: #1890ff">sss</span></template>
+          </a-tree>
+        </a-card>
+      </div>
 
-    <role-modal ref="modal" :tree-data="treeData" @saveSuccess="$refs.table.refresh()" @ok="handleOk"></role-modal>
+      <role-modal ref="modal" :tree-data="treeData" @saveSuccess="$refs.table.refresh()" @ok="handleOk"></role-modal>
 
-  </a-card>
+    </a-card>
+  </page-header-wrapper>
 </template>
 
 <script>
@@ -134,7 +136,7 @@
           this.$message.error(result.msg)
         }
       },
-      onRowEditClick(row){
+      onRowEditClick(row) {
         this.selectedRows = row
         this.checkedKeys = row.permissions.map(item => item.id)
       },

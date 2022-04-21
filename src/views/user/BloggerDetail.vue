@@ -10,7 +10,7 @@
         <a-descriptions-item label="注册时间">{{data.ctime}}</a-descriptions-item>
         <a-descriptions-item label="微信appId">{{data.appId}}</a-descriptions-item>
         <a-descriptions-item label="微信appSecret">{{data.appSecret}}</a-descriptions-item>
-        <a-descriptions-item label="平台url">{{data.mainUrl}}</a-descriptions-item>
+        <a-descriptions-item label="平台url">{{data.url}}</a-descriptions-item>
       </a-descriptions>
       <a-divider style="margin-bottom: 32px"/>
       <div class="my-style">

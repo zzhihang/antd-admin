@@ -68,7 +68,7 @@ const constantRouterComponents = {
   '/permission': RouteView,
   '/permission/role': () => import('@/views/permission/RoleList'),
   '/permission/user': () => import('@/views/permission/UserList'),
-  '/permission/dictionary': () => import('@/views/permission/dictionary/dictionary'),
+  '/permission/dictionary': () => import('@/views/permission/dictionary'),
 
 }
 
@@ -82,12 +82,12 @@ const notFoundRouter = {
 // 根级菜单
 const rootRouter = {
   key: '',
-  name: 'index',
+  name: '主页',
   path: '',
   component: 'BasicLayout',
-  redirect: '/dashboard',
+  redirect: '/user/blogger',
   meta: {
-    title: '首页'
+    title: '主页'
   },
   children: []
 }
@@ -127,7 +127,7 @@ export const generator = (routerMap, parent) => {
       path: item.path || `${(parent && parent.path) || ''}/${item.key}`,
       // 路由名称，建议唯一
       name: item.name || item.key || '',
-      component: constantRouterComponents[item.component || item.path || item.key] || (() => import(`@/views/${item.component}`)),
+      component: constantRouterComponents[item.path || item.component || item.key] || (() => import(`@/views/${item.component}`)),
 
       // meta: 页面标题, 菜单图标, 页面权限(供指令权限用，可去掉)
       meta: {
