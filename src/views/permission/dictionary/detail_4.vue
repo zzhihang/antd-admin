@@ -71,7 +71,7 @@
             <span v-if="record.isNew">
               <a @click="saveRow(record)">添加</a>
               <a-divider type="vertical"/>
-              <a @click="cancel(record.key)">取消</a>
+              <a @click="remove(record.key)">取消</a>
             </span>
                 <span v-else>
               <a @click="saveRow(record)">保存</a>
@@ -223,9 +223,12 @@
       },
       cancel(key) {
         const target = this.data.find(item => item.key === key)
-        Object.keys(target).forEach(key => {
-          target[key] = target._originalData[key]
-        })
+        if(target._originalData){
+          Object.keys(target).forEach(key => {
+            target[key] = target._originalData[key]
+          })
+        }
+        target.editable = !target.editable
         target._originalData = undefined
       },
       newMember () {

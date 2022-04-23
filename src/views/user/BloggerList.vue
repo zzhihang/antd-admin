@@ -68,6 +68,27 @@
         @cancel="handleCancel"
         @ok="handleOk"
       />
+      <a-modal
+        :visible="exportSmsVisible"
+        :width="340"
+        title="导出"
+        okText="验证"
+        @ok="onSmsModalOk"
+        @cancel="exportSmsVisible = false"
+      >
+        <a-input placeholder="请输入验证码" v-model="exportSms">
+          <template #suffix>
+            <a-button
+              type="primary"
+              @click="getCaptcha"
+              :disabled="state.smsSendBtn"
+              v-text="!state.smsSendBtn && '获取验证码' || (state.time+'s后可重新发送')"
+            >发送验证码
+            </a-button>
+          </template>
+        </a-input>
+        <p style="font-size: 12px;color: #999999;margin-top: 10px;"><a-icon type="info-circle"/>导出表格需要输入超管提供的验证码</p>
+      </a-modal>
     </a-card>
   </page-header-wrapper>
 </template>
@@ -75,7 +96,7 @@
 <script>
   import { STable } from '@/components'
   import {  ENABLE_STATUS } from '@/utils/dict'
-  import { getBloggerList, userDisable, userEnable, userSave } from '@/api/userService'
+  import { checkCode, getBloggerList, sysSmsSend, userDisable, userEnable, userSave } from '@/api/userService'
   import CreateForm from './modules/CreateForm'
 
   const columns = [
@@ -89,7 +110,7 @@
     },
     {
       title: '用户昵称',
-      dataIndex: 'nickname'
+      dataIndex: 'tzNickname'
     },
     {
       title: '手机号',
@@ -122,12 +143,13 @@
     name: 'TableList',
     components: {
       STable,
-      CreateForm
+      CreateForm,
     },
     data() {
       return {
         ENABLE_STATUS: [{text: '全部', value: ''}].concat(ENABLE_STATUS),
         visible: false,
+        exportSmsVisible: false,
         popVisible: false,
         confirmLoading: false,
         mdl: null,
@@ -137,11 +159,16 @@
         columnsOrigin: JSON.parse(JSON.stringify(columns)),
         columnsChecked: columns.map(item => item.title),
         ctime: '',
+        exportSms: '',
         queryParam: {
           queryText: '',
           status: '',
           ctimeStart: '',
           ctimeEnd: '',
+        },
+        state: {
+          time: 60,
+          smsSendBtn: false
         },
         loadData: parameter => {
           const requestParameters = Object.assign({}, parameter, this.queryParam)
@@ -169,6 +196,25 @@
       }
     },
     methods: {
+      getCaptcha (e) {
+        const {state} = this;
+        e.preventDefault()
+        state.smsSendBtn = true
+        sysSmsSend().then(result => {
+          if(result.success){
+            this.$message.success('发送成功')
+          }else{
+            const interval = window.setInterval(() => {
+              if (state.time-- <= 0) {
+                state.time = 60
+                state.smsSendBtn = false
+                window.clearInterval(interval)
+              }
+            }, 1000)
+          }
+        })
+
+      },
       handleAdd() {
         this.mdl = null
         this.visible = true
@@ -201,6 +247,14 @@
           })
         }
       },
+      async onSmsModalOk(){
+          const result = await checkCode(this.exportSms);
+          if(result.success){
+            this.exportData();
+          }else{
+            this.$message.error(result.msg);
+          }
+      },
       handleCancel() {
         this.visible = false
         const form = this.$refs.createModal.form
@@ -216,7 +270,7 @@
       async onDisableChange(record) {
         if (record.status === 1) {
           this.$confirm({
-            content: `你确定要禁用${record.id}吗？`,
+            content: `禁用后用户不能登录平台，后台不删除用户数据`,
             onOk: async () => {
               const result = await userDisable(record.id)
               if (result.success) {
@@ -241,15 +295,21 @@
         if(!this.selectedRows.length){
           return this.$message.warn('请先选择要导出的数据')
         }
-        const ids = this.selectedRows.map(item => item.id);
-        this.exportAll(ids);
+        this.currentAction = 'exportSelect';
+        this.exportSmsVisible = true;
       },
-      exportAll(id) {
-        let url = 'http://admin.shouzimu.xyz/api/admin/user/tz/export';
-        if(id.push){
-          url = 'http://admin.shouzimu.xyz/api/admin/user/tz/export?ids=' + id.join(',');
+      exportData(){
+        const ids = this.selectedRows.map(item => item.id);
+        let url = 'http://admin.shouzimu.xyz/api/admin/user/tz/export?code=' + this.exportSms;
+        if(this.currentAction === 'exportSelect'){
+          url = 'http://admin.shouzimu.xyz/api/admin/user/tz/export?' + 'code=' + this.exportSms + '&ids=' + ids.join(',');
         }
+        this.exportSms = '';
         window.open(url, '_blank')
+      },
+      exportAll() {
+        this.currentAction = 'exportAll';
+        this.exportSmsVisible = true;
       },
       createUser() {
 
@@ -268,5 +328,8 @@
 
   /deep/ .ant-checkbox-group-item {
     display: block;
+  }
+  /deep/.ant-input-affix-wrapper .ant-input-suffix{
+    right: 0;
   }
 </style>

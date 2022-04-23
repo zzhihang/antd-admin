@@ -106,3 +106,33 @@ export function getMemberInfo (params) {
     data: params
   })
 }
+
+/**
+* @Description: 导出短信
+* @Param: type  type直接传 糖主管理  会员管理 订单管理
+* @return:
+* @Author: zzhihang@hotmail.com
+* @date: 2022/4/23 16:59
+*/
+export function sysSmsSend (params) {
+  return request({
+    url: '/admin/syssms/send',
+    method: 'post',
+    data: params
+  })
+}
+
+/**
+* @Description: 传code校验验证码 然后 下载code也带上
+* @Param:
+* @return:
+* @Author: zzhihang@hotmail.com
+* @date: 2022/4/23 16:59
+*/
+export function checkCode (code) {
+  return request({
+    url: '/admin/user/tz/checkCode',
+    method: 'post',
+    data: {code}
+  })
+}

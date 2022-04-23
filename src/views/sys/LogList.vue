@@ -58,27 +58,33 @@
   const columns = [
     {
       title: '序号',
-      scopedSlots: { customRender: 'serial' }
+      scopedSlots: { customRender: 'serial' },
+      width: '100px'
     },
     {
       title: '用户ID',
       dataIndex: 'userId',
+      width: '100px'
     },
     {
       title: '用户昵称',
       dataIndex: 'nickname',
+      width: '100px'
     },
     {
       title: '手机号',
       dataIndex: 'phone',
-      customRender: (text) => text && (text.substr(0,3)+'****'+text.substr(7))
+      customRender: (text) => text && (text.substr(0,3)+'****'+text.substr(7)),
+      width: '150px'
     },
     {
       title: '角色',
       dataIndex: 'roleName',
+      width: '100px'
     },{
       title: '日志时间',
       dataIndex: 'ctime',
+      width: '200px'
     },{
       title: '操作记录',
       dataIndex: 'logText',

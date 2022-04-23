@@ -212,7 +212,7 @@ export default {
       const data = this.data
       return (newData || data).find(item => item.key === key)
     },
-    cancel (key) {
+    cancel (key) {debugger
       const target = this.data.find(item => item.key === key)
       Object.keys(target).forEach(key => { target[key] = target._originalData[key] })
       target._originalData = undefined

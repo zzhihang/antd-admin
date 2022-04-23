@@ -71,7 +71,7 @@
         const record = this.data;
         if(record.status === 1){
           this.$confirm({
-            content: `你确定要禁用${record.id}吗？`,
+            content: `禁用后用户不能登录平台，后台不删除用户数据`,
             onOk: async () => {
               const result = await userDisable(record.id);
               if(result.success){
