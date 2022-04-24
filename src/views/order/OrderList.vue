@@ -66,7 +66,7 @@
                 <a-button type="primary" @click="$refs.table.refresh(true)" v-allow="26">查询</a-button>
                 <a-button style="margin-left: 8px" type="primary" @click="exportSelect" v-allow="27">导出</a-button>
               <a-button style="margin-left: 8px" type="primary" @click="exportAll" v-allow="28">全部导出</a-button>
-                <a-button style="margin-left: 8px" @click="() => {this.queryParam = {};this.ctime = '';this.payTime=''}">重置</a-button>
+                <a-button style="margin-left: 8px" @click="() => {this.queryParam = {};this.ctime = '';this.payTime='';this.$refs.table.refresh(true)}">重置</a-button>
                 <a @click="toggleAdvanced" style="margin-left: 8px">
                   {{ advanced ? '收起' : '展开' }}
                   <a-icon :type="advanced ? 'up' : 'down'"/>
@@ -164,7 +164,7 @@
     },
     {
       title: '昵称',
-      dataIndex: 'nickname',
+      dataIndex: 'userNickname',
       align: 'center'
     },
     {

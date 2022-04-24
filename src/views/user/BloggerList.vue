@@ -28,7 +28,7 @@
               <a-button style="margin-left: 8px" type="primary" v-allow="13" @click="exportSelect">导出</a-button>
               <a-button style="margin-left: 8px" type="primary" v-allow="14"@click="exportAll">全部导出</a-button>
               <a-button style="margin-left: 8px" type="primary" v-allow="15" @click="handleAdd">创建用户</a-button>
-              <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
+              <a-button style="margin-left: 8px" @click="() => {this.queryParam = {};this.ctime = '';this.$refs.table.refresh(true)}">重置</a-button>
             </a-col>
           </a-row>
         </a-form>
@@ -110,7 +110,7 @@
     },
     {
       title: '用户昵称',
-      dataIndex: 'tzNickname'
+      dataIndex: 'nickname'
     },
     {
       title: '手机号',
@@ -183,8 +183,10 @@
     },
     watch: {
       ctime(val){
-        this.queryParam.ctimeStart = val[0].format('YYYY-MM-DD')
-        this.queryParam.ctimeEnd = val[1].format('YYYY-MM-DD')
+        if(val){
+          this.queryParam.ctimeStart = val[0].format('YYYY-MM-DD')
+          this.queryParam.ctimeEnd = val[1].format('YYYY-MM-DD')
+        }
       }
     },
     computed: {

@@ -116,7 +116,7 @@ export default {
           const result = await Login(loginParams);
           if(result.success){
             const {data} = result
-            storage.set(ACCESS_TOKEN, data.admin_token, 7 * 24 * 60 * 60 * 1000)
+            storage.set(ACCESS_TOKEN, data.admin_token, 2 * 24 * 60 * 60 * 1000)
             this.loginSuccess(result)
           }else{
             this.requestFailed(result)

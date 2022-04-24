@@ -13,7 +13,10 @@
           <a-input v-decorator="['appId', {rules: [{required: true, message: '请输入'}]}]" />
         </a-form-item>
         <a-form-item label="微信号" v-show="!createUserId">
-          <a-input v-decorator="['wxNumber', {rules: [{required: true, message: '请输入'}]}]" />
+          <a-input v-decorator="['wxNumber']" />
+        </a-form-item>
+        <a-form-item label="手机号" v-show="!createUserId">
+          <a-input v-decorator="['phone', {rules: [{required: true, message: '请输入'}]}]" />
         </a-form-item>
         <a-form-item label="appSecret" v-show="!createUserId">
           <a-input v-decorator="['appSecret', {rules: [{required: true, message: '请输入'}]}]" />
@@ -35,7 +38,7 @@
 <script>
 import pick from 'lodash.pick'
 // 表单字段
-const fields = ['appId', 'appSecret', 'appSecret']
+const fields = ['appId', 'appSecret', 'appSecret', 'phone']
 
 export default {
   props: {

@@ -44,7 +44,7 @@
               <a-button type="primary" v-allow="20" @click="$refs.table.refresh(true)">查询</a-button>
               <a-button style="margin-left: 8px" type="primary" v-allow="21" @click="exportSelect">导出</a-button>
               <a-button style="margin-left: 8px" type="primary" v-allow="22" @click="exportAll">全部导出</a-button>
-              <a-button style="margin-left: 8px" @click="() => {this.queryParam = {};this.ctime='';this.subscribeTime=''}">重置</a-button>
+              <a-button style="margin-left: 8px" @click="() => {this.queryParam = {};this.ctime='';this.subscribeTime='';$refs.table.refresh(true)}">重置</a-button>
             </a-col>
           </a-row>
         </a-form>

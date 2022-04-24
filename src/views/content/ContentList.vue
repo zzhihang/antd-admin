@@ -24,7 +24,7 @@
             </a-col>
             <a-col :md="24" :sm="24" style="text-align: right">
                 <a-button type="primary" @click="$refs.table.refresh(true)" v-allow="31">查询</a-button>
-                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
+                <a-button style="margin-left: 8px" @click="() => {this.queryParam = {};this.ctime = '';$refs.table.refresh(true)}">重置</a-button>
             </a-col>
           </a-row>
         </a-form>
@@ -197,7 +197,6 @@
       },
       handleCancel () {
         this.visible = false
-
         const form = this.$refs.createModal.form
         form.resetFields() // 清理表单数据（可不做）
       },
@@ -223,8 +222,10 @@
     },
     watch: {
       ctime(val){
-        this.queryParam.ctimeStart = val[0].format('YYYY-MM-DD')
-        this.queryParam.ctimeEnd = val[1].format('YYYY-MM-DD')
+        if(val){
+          this.queryParam.ctimeStart = val[0].format('YYYY-MM-DD')
+          this.queryParam.ctimeEnd = val[1].format('YYYY-MM-DD')
+        }
       }
     },
   }
