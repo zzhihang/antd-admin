@@ -51,12 +51,10 @@ export default {
     }
   },
   mounted () {
-    setTimeout(() => {
-      this.currentUser = {
-        name: this.userInfo.name,
-        avatar: this.userInfo.avatar
-      }
-    }, 500)
+    this.currentUser = {
+      name: this.userInfo.name,
+      avatar: this.userInfo.avatar
+    }
   }
 }
 </script>
