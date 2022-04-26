@@ -114,11 +114,11 @@ export function getMemberInfo (params) {
 * @Author: zzhihang@hotmail.com
 * @date: 2022/4/23 16:59
 */
-export function sysSmsSend (params) {
+export function sysSmsSend (type) {
   return request({
     url: '/admin/syssms/send',
     method: 'post',
-    data: params
+    data: {type}
   })
 }
 
@@ -129,10 +129,10 @@ export function sysSmsSend (params) {
 * @Author: zzhihang@hotmail.com
 * @date: 2022/4/23 16:59
 */
-export function checkCode (code) {
+export function checkCode ({type, code}) {
   return request({
-    url: '/admin/user/tz/checkCode',
+    url: '/admin/syssms/checkCode',
     method: 'post',
-    data: {code}
+    data: {type, code}
   })
 }

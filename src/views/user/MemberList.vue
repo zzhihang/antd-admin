@@ -42,8 +42,20 @@
             </a-col>
             <a-col :md="24" :sm="24" style="text-align: right">
               <a-button type="primary" v-allow="20" @click="$refs.table.refresh(true)">查询</a-button>
-              <a-button style="margin-left: 8px" type="primary" v-allow="21" @click="exportSelect">导出</a-button>
-              <a-button style="margin-left: 8px" type="primary" v-allow="22" @click="exportAll">全部导出</a-button>
+              <button-export
+                style="margin-left: 8px"
+                v-allow="21"
+                :ids="selectedIds"
+                type="part"
+                bill-type="member"
+                url="/admin/user/pt/export"
+              >导出</button-export>
+              <button-export
+                style="margin-left: 8px"
+                v-allow="22"
+                url="/admin/user/pt/export"
+                bill-type="member"
+              >全部导出</button-export>
               <a-button style="margin-left: 8px" @click="() => {this.queryParam = {};this.ctime='';this.subscribeTime='';$refs.table.refresh(true)}">重置</a-button>
             </a-col>
           </a-row>
@@ -94,6 +106,7 @@
   import { getMemberList, userDisable, userEnable, userSave } from '@/api/userService'
   import CreateForm from './modules/CreateForm'
   import { getTextByValue } from '@/utils/dictUtils'
+  import ButtonExport from '@/views/user/modules/ButtonExport'
 
   const columns = [
     {
@@ -186,6 +199,7 @@
     components: {
       STable,
       CreateForm,
+      ButtonExport
     },
     data () {
       this.columns = columns
@@ -235,6 +249,9 @@
           selectedRowKeys: this.selectedRowKeys,
           onChange: this.onSelectChange
         }
+      },
+      selectedIds(){
+        return this.selectedRows.map(item => item.id);
       }
     },
     methods: {

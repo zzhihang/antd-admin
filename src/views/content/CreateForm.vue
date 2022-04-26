@@ -45,7 +45,7 @@
         </a-form-item>
         <a-form-item label="备注" v-if="showRemark">
           <a-textarea v-if="!model.ifDetail" placeholder="请备注审核不通过原因（可选填）" v-decorator="['audit']" />
-          <p v-else>{{model.failInfo}}</p>
+          <p v-else>{{model.audit}}</p>
         </a-form-item>
       </a-form>
     </a-spin>
@@ -97,12 +97,13 @@ export default {
       this.model && this.form.setFieldsValue(pick(this.model, fields));
       this.type = this.model.type;
       this.content = this.model.content;
+      this.showRemark = String(this.model.status) === '2'
     })
   },
   methods: {
     onRadioChange(e) {
       this.showRemark = String(e.target.value) === '2'
-    }
+    },
   }
 }
 </script>

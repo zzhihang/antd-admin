@@ -25,8 +25,20 @@
             </a-col>
             <a-col :md="24" :sm="24" style="text-align: right">
               <a-button type="primary" @click="$refs.table.refresh(true)" v-allow="12">查询</a-button>
-              <a-button style="margin-left: 8px" type="primary" v-allow="13" @click="exportSelect">导出</a-button>
-              <a-button style="margin-left: 8px" type="primary" v-allow="14"@click="exportAll">全部导出</a-button>
+              <button-export
+                style="margin-left: 8px"
+                v-allow="13"
+                :ids="selectedIds"
+                type="part"
+                bill-type="blog"
+                url="/admin/user/tz/export"
+              >导出</button-export>
+              <button-export
+                style="margin-left: 8px"
+                v-allow="14"
+                url="/admin/user/tz/export"
+                bill-type="blog"
+              >全部导出</button-export>
               <a-button style="margin-left: 8px" type="primary" v-allow="15" @click="handleAdd">创建用户</a-button>
               <a-button style="margin-left: 8px" @click="() => {this.queryParam = {};this.ctime = '';this.$refs.table.refresh(true)}">重置</a-button>
             </a-col>
@@ -68,27 +80,6 @@
         @cancel="handleCancel"
         @ok="handleOk"
       />
-      <a-modal
-        :visible="exportSmsVisible"
-        :width="340"
-        title="导出"
-        okText="验证"
-        @ok="onSmsModalOk"
-        @cancel="exportSmsVisible = false"
-      >
-        <a-input placeholder="请输入验证码" v-model="exportSms">
-          <template #suffix>
-            <a-button
-              type="primary"
-              @click="getCaptcha"
-              :disabled="state.smsSendBtn"
-              v-text="!state.smsSendBtn && '获取验证码' || (state.time+'s后可重新发送')"
-            >发送验证码
-            </a-button>
-          </template>
-        </a-input>
-        <p style="font-size: 12px;color: #999999;margin-top: 10px;"><a-icon type="info-circle"/>导出表格需要输入超管提供的验证码</p>
-      </a-modal>
     </a-card>
   </page-header-wrapper>
 </template>
@@ -98,6 +89,8 @@
   import {  ENABLE_STATUS } from '@/utils/dict'
   import { checkCode, getBloggerList, sysSmsSend, userDisable, userEnable, userSave } from '@/api/userService'
   import CreateForm from './modules/CreateForm'
+  import smsModal from '@/views/user/modules/smsModal'
+  import ButtonExport from '@/views/user/modules/ButtonExport'
 
   const columns = [
     {
@@ -144,6 +137,7 @@
     components: {
       STable,
       CreateForm,
+      ButtonExport
     },
     data() {
       return {
@@ -156,19 +150,12 @@
         createUserId: '',
         createUserUrl: '',
         columns,
-        columnsOrigin: JSON.parse(JSON.stringify(columns)),
-        columnsChecked: columns.map(item => item.title),
         ctime: '',
-        exportSms: '',
         queryParam: {
           queryText: '',
           status: '',
           ctimeStart: '',
           ctimeEnd: '',
-        },
-        state: {
-          time: 60,
-          smsSendBtn: false
         },
         loadData: parameter => {
           const requestParameters = Object.assign({}, parameter, this.queryParam)
@@ -195,27 +182,14 @@
           selectedRowKeys: this.selectedRowKeys,
           onChange: this.onSelectChange
         }
+      },
+      selectedIds(){
+        return this.selectedRows.map(item => item.id);
       }
     },
     methods: {
-      getCaptcha (e) {
-        const {state} = this;
-        e.preventDefault()
-        state.smsSendBtn = true
-        sysSmsSend().then(result => {
-          if(result.success){
-            this.$message.success('发送成功')
-          }else{
-            const interval = window.setInterval(() => {
-              if (state.time-- <= 0) {
-                state.time = 60
-                state.smsSendBtn = false
-                window.clearInterval(interval)
-              }
-            }, 1000)
-          }
-        })
-
+      onSmsModalOk(code){
+        this.exportData(code);
       },
       handleAdd() {
         this.mdl = null
@@ -248,14 +222,6 @@
             }
           })
         }
-      },
-      async onSmsModalOk(){
-          const result = await checkCode(this.exportSms);
-          if(result.success){
-            this.exportData();
-          }else{
-            this.$message.error(result.msg);
-          }
       },
       handleCancel() {
         this.visible = false
@@ -293,29 +259,6 @@
           }
         }
       },
-      exportSelect() {
-        if(!this.selectedRows.length){
-          return this.$message.warn('请先选择要导出的数据')
-        }
-        this.currentAction = 'exportSelect';
-        this.exportSmsVisible = true;
-      },
-      exportData(){
-        const ids = this.selectedRows.map(item => item.id);
-        let url = 'http://admin.shouzimu.xyz/api/admin/user/tz/export?code=' + this.exportSms;
-        if(this.currentAction === 'exportSelect'){
-          url = 'http://admin.shouzimu.xyz/api/admin/user/tz/export?' + 'code=' + this.exportSms + '&ids=' + ids.join(',');
-        }
-        this.exportSms = '';
-        window.open(url, '_blank')
-      },
-      exportAll() {
-        this.currentAction = 'exportAll';
-        this.exportSmsVisible = true;
-      },
-      createUser() {
-
-      },
       onSelectChange(selectedRowKeys, selectedRows) {
         this.selectedRowKeys = selectedRowKeys
         this.selectedRows = selectedRows
@@ -330,8 +273,5 @@
 
   /deep/ .ant-checkbox-group-item {
     display: block;
-  }
-  /deep/.ant-input-affix-wrapper .ant-input-suffix{
-    right: 0;
   }
 </style>

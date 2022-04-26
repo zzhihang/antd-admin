@@ -64,8 +64,20 @@
             <a-col :md="!advanced && 8 || 24" :sm="24">
               <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
                 <a-button type="primary" @click="$refs.table.refresh(true)" v-allow="26">查询</a-button>
-                <a-button style="margin-left: 8px" type="primary" @click="exportSelect" v-allow="27">导出</a-button>
-              <a-button style="margin-left: 8px" type="primary" @click="exportAll" v-allow="28">全部导出</a-button>
+                <button-export
+                  style="margin-left: 8px"
+                  v-allow="27"
+                  :ids="selectedIds"
+                  type="part"
+                  bill-type="order"
+                  url="/admin/order/export"
+                >导出</button-export>
+                <button-export
+                  style="margin-left: 8px"
+                  v-allow="28"
+                  url="/admin/order/export"
+                  bill-type="order"
+                >全部导出</button-export>
                 <a-button style="margin-left: 8px" @click="() => {this.queryParam = {};this.ctime = '';this.payTime='';this.$refs.table.refresh(true)}">重置</a-button>
                 <a @click="toggleAdvanced" style="margin-left: 8px">
                   {{ advanced ? '收起' : '展开' }}
@@ -138,6 +150,7 @@
   import { getOrderList } from '@/api/orderService'
   import { BUSINESS_TYPE, PAY_STATUS, PAY_TYPE, ORDER_TYPE } from '@/utils/dict'
   import { getTextByValue } from '@/utils/dictUtils'
+  import ButtonExport from '@/views/user/modules/ButtonExport'
 
   const columns = [
     {
@@ -237,7 +250,8 @@
     components: {
       STable,
       Ellipsis,
-      OrderDetail
+      OrderDetail,
+      ButtonExport
     },
     data () {
       this.columns = columns
@@ -295,6 +309,9 @@
           selectedRowKeys: this.selectedRowKeys,
           onChange: this.onSelectChange
         }
+      },
+      selectedIds(){
+        return this.selectedRows.map(item => item.id);
       }
     },
     methods: {

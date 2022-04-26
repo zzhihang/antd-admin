@@ -190,3 +190,19 @@ export function upload (params) {
     data: params
   })
 }
+
+/**
+* @Description:  导出状态查询
+* @Param: type: 糖主管理  会员管理  订单管理
+* @return:
+* @Author: zzhihang@hotmail.com
+* @date: 2022/4/20 22:19
+*/
+
+export function exportStatus(type) {
+  return request({
+    url: '/admin/dict/exportStatus',
+    method: 'post',
+    data: {type}
+  })
+}
