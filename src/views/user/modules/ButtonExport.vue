@@ -3,7 +3,7 @@
     <a-button style="margin-left: 8px" type="primary" v-allow="13" @click="exportClick">
       <slot></slot>
     </a-button>
-    <sms-modal @onOk="exportData" :bill-type="billType" :show.sync="exportSmsVisible"/>
+    <sms-modal @onOk="exportData" :to-phone="toPhone" :bill-type="billType" :show.sync="exportSmsVisible"/>
   </div>
 </template>
 
@@ -47,7 +47,8 @@
     data() {
       return {
         exportSmsVisible: false,
-        ifNeedSms: false
+        ifNeedSms: false,
+        toPhone: ''
       }
     },
     methods: {
@@ -59,7 +60,8 @@
         }
         const result = await exportStatus(billType[this.billType]);
         if(result.success){
-          this.ifNeedSms = String(result.data) === '1';
+          this.ifNeedSms = String(result.data.ifValidate) === '1';
+          this.toPhone = result.data.phone
         }else{
           this.$message.error(result.msg);
         }

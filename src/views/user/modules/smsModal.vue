@@ -7,6 +7,7 @@
     @ok="onSmsModalOk"
     @cancel="onClose"
   >
+    <p>验证码将通过短信发送给{{this.toPhone.substr(0,3)+'****'+this.toPhone.substr(7)}}</p>
     <a-input placeholder="请输入验证码" v-model="exportSms">
       <template #suffix>
         <a-button
@@ -42,7 +43,11 @@
       billType: {
         type: String,
         default: ''
-      }
+      },
+      toPhone: {
+        type: String,
+        default: ''
+      },
     },
     data() {
       return {

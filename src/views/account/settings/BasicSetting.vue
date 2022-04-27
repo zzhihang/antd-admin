@@ -19,8 +19,9 @@
             <a-input-password v-model="passwd" placeholder="请输入"/>
           </a-form-item>
 
-          <a-form-item>
+          <a-form-item style="text-align: center">
             <a-button type="primary" @click="onSaveClick">保存</a-button>
+            <a-button style="margin-left: 10px;" @click="$router.go(-1)">取消</a-button>
           </a-form-item>
         </a-form>
 
@@ -72,12 +73,14 @@
         fixedNumber: [1, 1]
       },
       passwd: '',
-      name: ''
+      name: '',
+      lastPasswd: ''
     }
   },
   created(){
     this.name = this.$store.getters.userInfo.name;
-    this.passwd = this.$store.getters.userInfo.passwd
+    this.passwd = this.$store.getters.userInfo.passwd;
+    this.lastPasswd = this.$store.getters.userInfo.passwd;
   },
   methods: {
     setavatar (url) {
@@ -86,9 +89,13 @@
     async onSaveClick(){
       const params = {
         name: this.name,
-        passwd: md5(this.passwd),
         avatar: this.option.img,
-        id: this.$store.getters.userInfo.id
+        id: this.$store.getters.userInfo.id,
+        passwd: this.passwd
+      }
+      debugger
+      if(this.passwd !== this.lastPasswd){ //如果修改过密码的话 需要重新加密
+        params.passwd = md5(this.passwd);
       }
       const result = await saveLognUserInfo(params);
       if(result.success){

@@ -6,13 +6,13 @@
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
               <a-form-item label="字典信息">
-                <a-input placeholder="请输入字典名、描述"/>
+                <a-input placeholder="请输入字典名、描述" v-model="queryParam.queryText"/>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
               <a-form-item label="状态">
-                <a-select placeholder="请选择" default-value="all">
-                  <a-select-option value="all">全部</a-select-option>
+                <a-select placeholder="请选择" v-model="queryParam.status">
+                  <a-select-option value="">全部</a-select-option>
                   <a-select-option value="1">启用</a-select-option>
                   <a-select-option value="0">停用</a-select-option>
                 </a-select>
@@ -20,8 +20,8 @@
             </a-col>
             <a-col :md="8" :sm="24">
             <span class="table-page-search-submitButtons">
-              <a-button type="primary">查询</a-button>
-              <a-button style="margin-left: 8px">重置</a-button>
+              <a-button type="primary" @click="query">查询</a-button>
+              <a-button style="margin-left: 8px" @click="reset">重置</a-button>
             </span>
             </a-col>
           </a-row>
@@ -60,7 +60,10 @@
     data() {
       return {
         advanced: false,
-        queryParam: {},
+        queryParam: {
+          queryText: '',
+          status: ''
+        },
         columns: [
           {
             title: '序号',
@@ -95,6 +98,13 @@
       this.getList()
     },
     methods: {
+      query(){
+        this.getList();
+      },
+      reset(){
+        this.queryParam = {};
+        this.query()
+      },
       async getList() {
         const requestParameters = Object.assign({}, this.queryParam)
         const { data } = await getDicList(requestParameters)
