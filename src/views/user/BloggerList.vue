@@ -67,6 +67,8 @@
         <span slot="action" slot-scope="text, record" v-allow="18">
           <template>
             <a @click="handleDetail(record)">查看详情</a>
+            <a-divider type="vertical" />
+            <a @click="handleTemplate(record)">模板管理</a>
           </template>
         </span>
       </s-table>
@@ -80,17 +82,25 @@
         @cancel="handleCancel"
         @ok="handleOk"
       />
+      <wx-template
+        ref="createModal2"
+        :visible="editTemplateVisible"
+        :loading="confirmLoading"
+        :model="mdl2"
+        @cancel="handleTemCancel"
+        @ok="handleTemOk"
+      />
     </a-card>
   </page-header-wrapper>
 </template>
 
 <script>
   import { STable } from '@/components'
-  import {  ENABLE_STATUS } from '@/utils/dict'
-  import { checkCode, getBloggerList, sysSmsSend, userDisable, userEnable, userSave } from '@/api/userService'
+  import { ENABLE_STATUS } from '@/utils/dict'
+  import { getBloggerList, updateWxTemplate, userDisable, userEnable, userSave } from '@/api/userService'
   import CreateForm from './modules/CreateForm'
-  import smsModal from '@/views/user/modules/smsModal'
   import ButtonExport from '@/views/user/modules/ButtonExport'
+  import WxTemplate from '@/views/user/modules/WxTemplate'
 
   const columns = [
     {
@@ -127,7 +137,7 @@
     {
       title: '操作',
       dataIndex: 'action',
-      width: '150px',
+      width: '200px',
       scopedSlots: { customRender: 'action' }
     }
   ]
@@ -137,16 +147,19 @@
     components: {
       STable,
       CreateForm,
-      ButtonExport
+      ButtonExport,
+      WxTemplate
     },
     data() {
       return {
         ENABLE_STATUS: [{text: '全部', value: ''}].concat(ENABLE_STATUS),
         visible: false,
+        editTemplateVisible: false,
         exportSmsVisible: false,
         popVisible: false,
         confirmLoading: false,
         mdl: null,
+        mdl2: null,
         createUserId: '',
         createUserUrl: '',
         columns,
@@ -195,10 +208,6 @@
         this.mdl = null
         this.visible = true
       },
-      handleEdit(record) {
-        this.visible = true
-        this.mdl = { ...record }
-      },
       handleOk() {
         if (this.createUserId) {
           this.visible = false
@@ -228,12 +237,44 @@
         const form = this.$refs.createModal.form
         form.resetFields() // 清理表单数据（可不做）
       },
+      handleTemCancel(){
+        this.editTemplateVisible = false;
+        const form = this.$refs.createModal2.form
+        form.resetFields() // 清理表单数据（可不做）
+      },
+      handleTemOk(){
+        const form = this.$refs.createModal2.form
+        this.confirmLoading = true
+        form.validateFields(async (errors, values) => {
+          if (!errors) {
+            values.id = this.mdl2.id;
+            const result = await updateWxTemplate(values);
+            if(result.success){
+              // 重置表单数据
+              form.resetFields()
+              this.$refs.table.refresh()
+              this.$message.info('修改成功')
+            }else{
+              this.$message.error(result.msg)
+            }
+            this.$refs.table.refresh()
+            this.confirmLoading = false
+            this.editTemplateVisible = false;
+          } else {
+            this.confirmLoading = false
+          }
+        })
+      },
       handleDetail({ id }) {
         this.$router.push({
           name: 'BloggerListDetail', query: {
             id
           }
         })
+      },
+      handleTemplate(record){
+          this.editTemplateVisible = true;
+          this.mdl2 = { ...record };
       },
       async onDisableChange(record) {
         if (record.status === 1) {

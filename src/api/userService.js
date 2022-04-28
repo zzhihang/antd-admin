@@ -61,6 +61,21 @@ export function userSave (data) {
 }
 
 /**
+* @Description: 修改模板id
+* @Param:
+* @return:
+* @Author: zzhihang@hotmail.com
+* @date: 2022/4/9 23:48
+*/
+export function updateWxTemplate (data) {
+  return request({
+    url: '/admin/user/tz/updateWxTemplate',
+    method: 'post',
+    data: data
+  })
+}
+
+/**
 * @Description: 保存服务费
 * @Param:
 * @return:
