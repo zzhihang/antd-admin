@@ -209,12 +209,12 @@
 
         const result = await phoneSave(params);
         if(result.success){
-          this.memberLoading = false;
           this.$message.success('操作成功');
           this.getDicInfo()
         }else{
           this.$message.error(result.msg);
         }
+        this.memberLoading = false;
       },
       toggle(key) {
         const target = this.data.find(item => item.key === key)
