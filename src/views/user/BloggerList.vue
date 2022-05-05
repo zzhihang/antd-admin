@@ -218,14 +218,19 @@
           this.confirmLoading = true
           form.validateFields(async (errors, values) => {
             if (!errors) {
-              const { data } = await userSave(values)
-              this.createUserId = data.id
-              this.createUserUrl = data.url
+              const result = await userSave(values)
+              const {data} = result;
+              if(result.success){
+                this.createUserId = data.id
+                this.createUserUrl = data.url
+                // 重置表单数据
+                form.resetFields()
+                this.$refs.table.refresh()
+                this.$message.info('新增成功')
+              }else{
+                this.$message.error(result.msg)
+              }
               this.confirmLoading = false
-              // 重置表单数据
-              form.resetFields()
-              this.$refs.table.refresh()
-              this.$message.info('新增成功')
             } else {
               this.confirmLoading = false
             }

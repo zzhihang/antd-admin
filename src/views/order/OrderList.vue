@@ -344,20 +344,6 @@
           date: moment(new Date())
         }
       },
-      exportSelect() {
-        if(!this.selectedRows.length){
-          return this.$message.warn('请先选择要导出的数据')
-        }
-        const ids = this.selectedRows.map(item => item.id);
-        this.exportAll(ids);
-      },
-      exportAll(id) {
-        let url = 'http://admin.shouzimu.xyz/api/admin/order/export';
-        if(id.push){
-          url = 'http://admin.shouzimu.xyz/api/admin/order/export?ids=' + id.join(',');
-        }
-        window.open(url, '_blank')
-      },
     },
     watch: {
       ctime(val){

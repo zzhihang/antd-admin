@@ -13,33 +13,17 @@ const request = axios.create({
 })
 
 // 异常拦截处理器
-// const errorHandler = (error) => {
-//   if (error.response) {
-//     const data = error.response.data
-//     // 从 localstorage 获取 token
-//     const token = storage.get(ACCESS_TOKEN)
-//     if (error.response.status === 403) {
-//       notification.error({
-//         message: 'Forbidden',
-//         description: data.message
-//       })
-//     }
-//     if (error.response.status === 401 && !(data.result && data.result.isLogin)) {
-//       notification.error({
-//         message: 'Unauthorized',
-//         description: 'Authorization verification failed'
-//       })
-//       if (token) {
-//         store.dispatch('Logout').then(() => {
-//           setTimeout(() => {
-//             window.location.reload()
-//           }, 1500)
-//         })
-//       }
-//     }
-//   }
-//   return Promise.reject(error)
-// }
+const errorHandler = (error) => {debugger
+  if (error.response) {
+    if (error.response.status === 500) {
+      notification.error({
+        message: '错误',
+        description: '服务器出小差了,请稍后重试'
+      })
+    }
+  }
+  return Promise.reject(error)
+}
 
 // request interceptor
 // request.interceptors.request.use(config => {
@@ -53,13 +37,13 @@ const request = axios.create({
 // }, errorHandler)
 //
 // // response interceptor
-// request.interceptors.response.use((response) => {
-//   return response.data
-// }, errorHandler)
-
 request.interceptors.response.use((response) => {
   return response.data
-})
+}, errorHandler)
+
+// request.interceptors.response.use((response) => {
+//   return response.data
+// })
 
 const installer = {
   vm: {},

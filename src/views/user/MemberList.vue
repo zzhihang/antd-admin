@@ -321,23 +321,6 @@
           }
         }
       },
-      exportSelect() {
-        if(!this.selectedRows.length){
-          return this.$message.warn('请先选择要导出的数据')
-        }
-        const ids = this.selectedRows.map(item => item.id);
-        this.exportAll(ids);
-      },
-      exportAll(id) {
-        let url = 'http://admin.shouzimu.xyz/api/admin/user/pt/export';
-        if(id.push){
-          url = 'http://admin.shouzimu.xyz/api/admin/user/pt/export?ids=' + id.join(',');
-        }
-        window.open(url, '_blank')
-      },
-      createUser(){
-
-      },
       onSelectChange (selectedRowKeys, selectedRows) {
         this.selectedRowKeys = selectedRowKeys
         this.selectedRows = selectedRows

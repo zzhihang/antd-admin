@@ -30,7 +30,7 @@ Vue.component('pro-layout', ProLayout)
 Vue.component('page-container', PageHeaderWrapper)
 Vue.component('page-header-wrapper', PageHeaderWrapper)
 
-
+a
 import VueClipboard from 'vue-clipboard2'
 Vue.use(VueClipboard)
 

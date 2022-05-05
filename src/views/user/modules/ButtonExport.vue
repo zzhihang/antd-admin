@@ -11,6 +11,7 @@
   import Vue from 'vue'
   import smsModal from '@/views/user/modules/smsModal'
   import { exportStatus } from '@/api/permissionService'
+  import { host } from '@/utils/env.config'
 
   const billType = {
      blog: '糖主管理',
@@ -74,15 +75,15 @@
       async exportData(sms) {
         if(this.type === 'all'){
           if(this.ifNeedSms){
-            window.open(`http://admin.shouzimu.xyz/api${this.url}?code=${sms}`, '_blank')
+            window.open(`${host}/api${this.url}?code=${sms}`, '_blank')
           }else{
-            window.open(`http://admin.shouzimu.xyz/api${this.url}`, '_blank')
+            window.open(`${host}/api${this.url}`, '_blank')
           }
         }else{
           if(this.ifNeedSms){
-            window.open(`http://admin.shouzimu.xyz/api${this.url}?code=${sms}&ids=${this.ids.join(',')}`, '_blank')
+            window.open(`${host}/api${this.url}?code=${sms}&ids=${this.ids.join(',')}`, '_blank')
           }else{
-            window.open(`http://admin.shouzimu.xyz/api${this.url}?ids=${this.ids.join(',')}`, '_blank')
+            window.open(`${host}/api${this.url}?ids=${this.ids.join(',')}`, '_blank')
           }
         }
       }
