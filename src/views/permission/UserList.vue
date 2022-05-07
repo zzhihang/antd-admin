@@ -6,12 +6,12 @@
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
               <a-form-item label="用户信息">
-                <a-input placeholder="请输入用户ID、昵称、手机号"/>
+                <a-input v-model="queryParam.queryText" placeholder="请输入用户ID、昵称、手机号"/>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
               <a-form-item label="角色">
-                <a-select placeholder="请选择" default-value="">
+                <a-select placeholder="请选择" default-value="" v-model="queryParam.role">
                   <a-select-option value="">全部</a-select-option>
                   <a-select-option v-for="(item, index) in roleList" :value="item.id" :key="index">{{item.name}}
                   </a-select-option>
@@ -21,8 +21,8 @@
             <a-col :md="8" :sm="24">
             <span class="table-page-search-submitButtons">
               <a-button type="primary" @click="onCreateClick" v-allow="37">创建账号</a-button>
-              <a-button type="primary" style="margin-left: 16px" v-allow="38">查询</a-button>
-              <a-button style="margin-left: 8px">重置</a-button>
+              <a-button type="primary" style="margin-left: 16px" @click="$refs.table.refresh(true)" v-allow="38">查询</a-button>
+              <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
             </span>
             </a-col>
           </a-row>
@@ -183,10 +183,14 @@
         form: this.$form.createForm(this),
         permissions: [],
 
-        queryParam: {},
+        queryParam: {
+          queryText: '',
+          role: ''
+        },
         columns,
         loadData: parameter => {
-          return sysUserList(parameter)
+          const requestParameters = Object.assign({}, parameter, this.queryParam)
+          return sysUserList(requestParameters)
             .then(res => {
               return res.data
             })

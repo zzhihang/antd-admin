@@ -75,17 +75,18 @@
       async exportData(sms) {
         if(this.type === 'all'){
           if(this.ifNeedSms){
-            window.open(`${host}/api${this.url}?code=${sms}`, '_blank')
+            window.location.href = `${host}/api${this.url}?code=${sms}`
           }else{
-            window.open(`${host}/api${this.url}`, '_blank')
+            window.location.href = `${host}/api${this.url}`
           }
         }else{
           if(this.ifNeedSms){
-            window.open(`${host}/api${this.url}?code=${sms}&ids=${this.ids.join(',')}`, '_blank')
+            window.location.href = `${host}/api${this.url}?code=${sms}&ids=${this.ids.join(',')}`
           }else{
-            window.open(`${host}/api${this.url}?ids=${this.ids.join(',')}`, '_blank')
+            window.location.href = `${host}/api${this.url}?ids=${this.ids.join(',')}`
           }
         }
+        return false;
       }
     }
 

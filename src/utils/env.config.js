@@ -1,1 +1,1 @@
-export const host = 'http://admin.shouzimu.xyz'
+export const host = 'https://dev-admin-fcandy.line-hi.com'
